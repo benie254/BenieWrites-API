@@ -24,7 +24,7 @@ import cloudinary.api
 
 MODE=os.getenv("MODE", default="dev")
 SECRET_KEY = os.getenv("SECRET_KEY")
-DEBUG = os.getenv('DEBUG', default=False)
+DEBUG = os.getenv('DEBUG')
 # development
 if os.getenv('MODE')=="dev":
    DATABASES = {

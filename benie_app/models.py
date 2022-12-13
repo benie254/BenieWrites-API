@@ -34,3 +34,10 @@ class Reaction(models.Model):
 
     def __bool__(self):
         return self.like
+
+class Feedback(models.Model):
+    comment = models.TextField(max_length=2500,null=True,blank=True)
+    chapter = models.ForeignKey(Chapter,on_delete=models.CASCADE,default='')
+
+    def __bool__(self):
+        return self.comment

@@ -22,7 +22,7 @@ import cloudinary
 import cloudinary.uploader 
 import cloudinary.api 
 
-MODE=os.getenv("MODE", default="dev")
+MODE=os.getenv("MODE")
 SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv('DEBUG')
 # development
@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'knox',
     'corsheaders',
     'cloudinary',
+    'bootstrap5',
 ]
 
 REST_FRAMEWORK = {

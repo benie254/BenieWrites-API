@@ -8,22 +8,22 @@ class StorySerializer(serializers.ModelSerializer):
         model = Story
         fields = ('__all__')
 
-class StorySerializer(serializers.ModelSerializer):
+class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = ('__all__')
 
-class StorySerializer(serializers.ModelSerializer):
+class ChapterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chapter
         fields = ('__all__')
 
-class StorySerializer(serializers.ModelSerializer):
+class ReactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reaction
         fields = ('__all__')
 
-class StorySerializer(serializers.ModelSerializer):
+class FeedbackSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feedback
         fields = ('__all__')

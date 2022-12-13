@@ -17,4 +17,8 @@ class Chapter(models.Model):
     cover = CloudinaryField('Chapter Cover',null=True)
     title = models.CharField(max_length=120)
     description = models.TextField(max_length=5000) 
-    Story = models.ForeignKey(Story,on_delete=models.CASCADE)
+    story = models.ForeignKey(Story,on_delete=models.CASCADE)
+
+class Reaction(models.Model):
+    like = models.BooleanField(default=False,null=True,blank=True)
+    story = models.ForeignKey(Story,on_delete=models.CASCADE)

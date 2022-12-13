@@ -2,16 +2,19 @@ from django.shortcuts import render
 from benie_app.models import Story, Reaction
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
 
 from benie_app.serializers import StorySerializer, TagSerializer, ReactionSerializer, FeedbackSerializer, ChapterSerializer
 from benie_app.models import Story, Tag, Reaction, Feedback, Chapter
 
 # Create your views here.
+def landing(request):
+    return render(request,'landing.html',{})
+    
 def home(request):
     stories = Story.objects.all()
-    likes = Reaction.objects.all().filter(like=True)
-    dislikes = Reaction.objects.all().filter(like=False)
-    return render(request,'index.html',{"stories":stories,"likes":likes,"dislikes":dislikes,})
+    chapters = Chapter.objects.all()
+    return render(request,'index.html',{"stories":stories,"chapters":chapters})
 
 class AllStories(APIView):
     def get(self,request):
@@ -31,14 +34,54 @@ class AllFeedbacks(APIView):
         serializers = FeedbackSerializer(feedbacks,many=True)
         return Response(serializers.data)
 
+    def post(self, request):
+        serializers = FeedbackSerializer(data=request.data)
+        if serializers.is_valid():
+            serializers.save()
+            return Response(serializers.data,status=status.HTTP_201_CREATED)
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+
 class AllRecations(APIView):
     def get(self,request):
         reactions = Reaction.objects.all()
         serializers = ReactionSerializer(reactions,many=True)
         return Response(serializers.data)
 
+    def post(self, request):
+        serializers = ReactionSerializer(data=request.data)
+        if serializers.is_valid():
+            serializers.save()
+            return Response(serializers.data,status=status.HTTP_201_CREATED)
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)  
+
 class AllChapters(APIView):
     def get(self,request):
         chapters = Chapter.objects.all()
         serializers = ChapterSerializer(chapters,many=True)
+        return Response(serializers.data)
+
+class StoryDetails(APIView):
+    def get(self,request, id):
+        story = Story.objects.all().filter(pk=id).last()
+        serializers = StorySerializer(story,many=False)
+        return Response(serializers.data)
+
+class ChapterDetails(APIView):
+    def get(self,request, id):
+        chapter = Chapter.objects.all().filter(pk=id).last()
+        serializers = ChapterSerializer(chapter,many=False)
+        return Response(serializers.data)
+
+class Likes(APIView):
+    def get(self, request, id):
+        likes = Reaction.objects.all().filter(chapter=id)
+        chap_likes = likes.count 
+        serializers = ReactionSerializer(chap_likes,many=True)
+        return Response(serializers.data)
+
+class Comments(APIView):
+    def get(self, request, id):
+        comments = Feedback.objects.all().filter(chapter=id)
+        chap_comments = comments.count 
+        serializers = FeedbackSerializer(chap_comments,many=True)
         return Response(serializers.data)

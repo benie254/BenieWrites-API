@@ -20,8 +20,10 @@ from benie_app import views
 urlpatterns = [
     path('', views.home, name='home'),
     url(r'^stories/all/$',views.AllStories.as_view(),name='all-stories'),
+    url(r'^story/details/(\d+)$',views.StoryDetails.as_view(),name='story-details'),
     url(r'^tags/all/$',views.AllTags.as_view(),name='all-tags'),
     url(r'^feedbacks/all/$',views.AllFeedbacks.as_view(),name='all-feedbacks'),
     url(r'^reactions/all/$',views.AllRecations.as_view(),name='all-reactions'),
     url(r'^chapters/all/$',views.AllChapters.as_view(),name='all-chapters'),
+    url(r'^chapter/details/(\d+)$',views.ChapterDetails.as_view(),name='chapter-details'),
 ]

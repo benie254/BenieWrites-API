@@ -3,8 +3,24 @@
 {% block content %}
 <div class="container shadow">
     <br>
-    <h1>Benie Writes <br><span><h2>Endpoints</h2></span></h1>
+    <h1>Benie Writes <br><span><h4>API Endpoints</h4></span></h1>
     <br>
-    
+    <ol class="bg-light w-50">
+        <li><a href="{% url 'all-stories' %}">All stories</a></li>
+        <span>
+            <ul>
+                {% for s in stories %}<li><a href="{% url 'story-details' s.id %}">Story: <span><strong>{{s.title}}</strong></span> details</a></li>{% endfor %}
+            </ul>
+        </span>
+        <li><a href="{% url 'all-chapters' %}">All chapters</a></li>
+        <span>
+            <ul>
+                {% for c in chapters %}<li><a href="{% url 'chapter-details' c.id %}">Chapter: {{s.id}}. <span><strong>{{s.title}}</strong> </span> details</a></li>{% endfor %}
+            </ul>
+        </span>
+        <li><a href="{% url 'all-tags' %}">All tags</a></li>
+        <li><a href="{% url 'all-feedbacks' %}">All feedbacks</a></li>
+        <li><a href="{% url 'all-reactions' %}">All reactions</a></li>
+    </ol>
 </div>
 {% endblock %}

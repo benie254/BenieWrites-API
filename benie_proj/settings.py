@@ -18,6 +18,9 @@ from datetime import timedelta
 import dotenv
 from dotenv import load_dotenv
 load_dotenv()  # loads the os.getenvs from .env
+import cloudinary 
+import cloudinary.uploader 
+import cloudinary.api 
 
 MODE=os.getenv("MODE", default="dev")
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -69,6 +72,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'knox',
     'corsheaders',
+    'cloudinary',
 ]
 
 REST_FRAMEWORK = {
@@ -195,3 +199,5 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CLOUDINARY_URL = os.getenv('CLOUDINARY_URL')

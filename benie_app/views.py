@@ -3,6 +3,8 @@ from benie_app.models import Story, Reaction
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.decorators import permission_classes 
+from rest_framework.permissions import IsAdminUser
 
 from benie_app.serializers import StorySerializer, TagSerializer, ReactionSerializer, FeedbackSerializer, ChapterSerializer
 from benie_app.models import Story, Tag, Reaction, Feedback, Chapter
@@ -85,3 +87,27 @@ class Comments(APIView):
         chap_comments = comments.count 
         serializers = FeedbackSerializer(chap_comments,many=True)
         return Response(serializers.data)
+
+@permission_classes([IsAdminUser,])
+class AddStory(APIView):
+    def post(self, request):
+        serializers = StorySerializer(data=request.data)
+        if serializers.is_valid():
+            serializers.save()
+            return Response(serializers.data,status=status.HTTP_201_CREATED)
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)  
+
+@permission_classes([IsAdminUser,])
+class UpdateStory(APIView):
+    def put(self, request, id, format=None):
+        story = Story.objects.all().filter(pk=id).last()
+        serializers = StorySerializer(story,request.data)
+        if serializers.is_valid():
+            serializers.save()
+            return Response(serializers.data)
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST) 
+
+    def delete(self, request, id, format=None):
+        story = Story.objects.all().filter(pk=id).last()
+        story.delete()
+        return Response(status=status.HTTP_200_OK) 

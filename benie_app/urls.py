@@ -26,4 +26,8 @@ urlpatterns = [
     url(r'^reactions/all/$',views.AllRecations.as_view(),name='all-reactions'),
     url(r'^chapters/all/$',views.AllChapters.as_view(),name='all-chapters'),
     url(r'^chapter/details/(\d+)$',views.ChapterDetails.as_view(),name='chapter-details'),
+    #admin
+    url(r'^admin/story/add/$',views.AddStory.as_view(),name='add-story'),
+    url(r'^admin/story/edit/(\d+)$',views.UpdateStory.as_view(),name='edit-story'),
+    url(r'^admin/story/delete/(\d+)$',views.UpdateStory.as_view(),name='delete-story'),
 ]

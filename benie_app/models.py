@@ -15,7 +15,7 @@ class Story(models.Model):
     description = models.TextField(max_length=5000,default='')
     CATEGORIES = (('mys','mystery',),('thr','thriller'),('dr','drama'),('mys/thr','mystery/thriller'),('act','action'),('rom','romance'))
     category = models.CharField(max_length=60,choices=CATEGORIES,default='')
-    tagged = models.ManyToManyField(Tag)
+    tagged = models.ManyToManyField(Tag,null=True,blank=True)
     uploaded = models.DateTimeField(default=timezone.now)
     first_published = models.DateField(default=timezone.now)
     STATUSES = (('com','completed'),('on','ongoing'))

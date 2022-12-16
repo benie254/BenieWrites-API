@@ -28,6 +28,9 @@ urlpatterns = [
     url(r'^chapter/details/(\d+)$',views.ChapterDetails.as_view(),name='chapter-details'),
     #admin
     url(r'^admin/story/add/$',views.AddStory.as_view(),name='add-story'),
-    url(r'^admin/story/edit/(\d+)$',views.UpdateStory.as_view(),name='edit-story'),
-    url(r'^admin/story/delete/(\d+)$',views.UpdateStory.as_view(),name='delete-story'),
+    url(r'^admin/chapter/add/$',views.AddChapter.as_view(),name='add-chapter'),
+    url(r'^admin/tag/add/$',views.AddTag.as_view(),name='add-tag'),
+    url(r'^admin/tag/details/(\d+)$',views.TagDetails.as_view(),name='tag-details'),
+    url(r'^admin/feedback/details/(\d+)$',views.FeedbackDetails.as_view(),name='feedback-details'),
+    url(r'^admin/reaction/details/(\d+)$',views.ReactionDetails.as_view(),name='reaction-details'),
 ]

@@ -135,6 +135,15 @@ class UpdateChapter(APIView):
         chap = Chapter.objects.all().filter(pk=id).last()
         chap.delete()
         return Response(status=status.HTTP_200_OK) 
+        
+# @permission_classes([IsAdminUser,])
+class AddTag(APIView):
+    def post(self, request):
+        serializers = TagSerializer(data=request.data)
+        if serializers.is_valid():
+            serializers.save()
+            return Response(serializers.data,status=status.HTTP_201_CREATED)
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST) 
 
 # @permission_classes([IsAdminUser,])
 class TagDetails(APIView):
@@ -142,13 +151,6 @@ class TagDetails(APIView):
         tag = Tag.objects.all().filter(pk=id).last()
         serializers = TagSerializer(tag,many=False)
         return Response(serializers.data)
-
-    def post(self, request):
-        serializers = TagSerializer(data=request.data)
-        if serializers.is_valid():
-            serializers.save()
-            return Response(serializers.data,status=status.HTTP_201_CREATED)
-        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)  
 
     def put(self, request, id, format=None):
         tag = Tag.objects.all().filter(pk=id).last()

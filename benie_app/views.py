@@ -113,60 +113,84 @@ class UpdateStory(APIView):
         return Response(status=status.HTTP_200_OK) 
 
 # @permission_classes([IsAdminUser,])
+class AddChapter(APIView):
+    def post(self, request):
+        serializers = ChapterSerializer(data=request.data)
+        if serializers.is_valid():
+            serializers.save()
+            return Response(serializers.data,status=status.HTTP_201_CREATED)
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)  
+
+# @permission_classes([IsAdminUser,])
+class UpdateChapter(APIView):
+    def put(self, request, id, format=None):
+        chap = Chapter.objects.all().filter(pk=id).last()
+        serializers = ChapterSerializer(chap,request.data)
+        if serializers.is_valid():
+            serializers.save()
+            return Response(serializers.data)
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST) 
+
+    def delete(self, request, id, format=None):
+        chap = Chapter.objects.all().filter(pk=id).last()
+        chap.delete()
+        return Response(status=status.HTTP_200_OK) 
+
+# @permission_classes([IsAdminUser,])
 class TagDetails(APIView):
     def get(self,request, id):
-        story = Story.objects.all().filter(pk=id).last()
-        serializers = StorySerializer(story,many=False)
+        tag = Tag.objects.all().filter(pk=id).last()
+        serializers = TagSerializer(tag,many=False)
         return Response(serializers.data)
 
     def post(self, request):
-        serializers = StorySerializer(data=request.data)
+        serializers = TagSerializer(data=request.data)
         if serializers.is_valid():
             serializers.save()
             return Response(serializers.data,status=status.HTTP_201_CREATED)
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)  
 
     def put(self, request, id, format=None):
-        story = Story.objects.all().filter(pk=id).last()
-        serializers = StorySerializer(story,request.data)
+        tag = Tag.objects.all().filter(pk=id).last()
+        serializers = TagSerializer(tag,request.data)
         if serializers.is_valid():
             serializers.save()
             return Response(serializers.data)
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST) 
 
     def delete(self, request, id, format=None):
-        story = Story.objects.all().filter(pk=id).last()
-        story.delete()
+        tag = Tag.objects.all().filter(pk=id).last()
+        tag.delete()
         return Response(status=status.HTTP_200_OK) 
 
 # @permission_classes([IsAdminUser,])
 class ReactionDetails(APIView):
     def get(self,request, id):
-        story = Story.objects.all().filter(pk=id).last()
-        serializers = StorySerializer(story,many=False)
+        reaction = Reaction.objects.all().filter(pk=id).last()
+        serializers = ReactionSerializer(reaction,many=False)
         return Response(serializers.data)
 
     def delete(self, request, id, format=None):
-        story = Story.objects.all().filter(pk=id).last()
-        story.delete()
+        reaction = Reaction.objects.all().filter(pk=id).last()
+        reaction.delete()
         return Response(status=status.HTTP_200_OK) 
 
 # @permission_classes([IsAdminUser,])
 class FeedbackDetails(APIView):
     def get(self,request, id):
-        story = Story.objects.all().filter(pk=id).last()
-        serializers = StorySerializer(story,many=False)
+        feedback = Feedback.objects.all().filter(pk=id).last()
+        serializers = FeedbackSerializer(feedback,many=False)
         return Response(serializers.data)
 
     def put(self, request, id, format=None):
-        story = Story.objects.all().filter(pk=id).last()
-        serializers = StorySerializer(story,request.data)
+        feedback = Feedback.objects.all().filter(pk=id).last()
+        serializers = FeedbackSerializer(feedback,request.data)
         if serializers.is_valid():
             serializers.save()
             return Response(serializers.data)
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST) 
 
     def delete(self, request, id, format=None):
-        story = Story.objects.all().filter(pk=id).last()
-        story.delete()
+        feedback = Feedback.objects.all().filter(pk=id).last()
+        feedback.delete()
         return Response(status=status.HTTP_200_OK) 

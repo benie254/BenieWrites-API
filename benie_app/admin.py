@@ -1,5 +1,5 @@
 from django.contrib import admin
-from benie_app.models import Story, Tag, Chapter, Reaction
+from benie_app.models import Story, Tag, Chapter, Reaction, Feedback
 
 # Register your models here.
 class StoryAdmin(admin.ModelAdmin):
@@ -11,3 +11,4 @@ admin.site.register(Story,StoryAdmin)
 admin.site.register(Tag)
 admin.site.register(Chapter)
 admin.site.register(Reaction)
+admin.site.register(Feedback)

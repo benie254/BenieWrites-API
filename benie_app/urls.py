@@ -21,6 +21,7 @@ urlpatterns = [
     path('', views.home, name='home'),
     url(r'^stories/all/$',views.AllStories.as_view(),name='all-stories'),
     url(r'^story/details/(\d+)$',views.StoryDetails.as_view(),name='story-details'),
+    url(r'^story/chapters/(\d+)$',views.StoryChapters.as_view(),name='story-chapters'),
     url(r'^tags/all/$',views.AllTags.as_view(),name='all-tags'),
     url(r'^feedbacks/all/$',views.AllFeedbacks.as_view(),name='all-feedbacks'),
     url(r'^reactions/all/$',views.AllRecations.as_view(),name='all-reactions'),
@@ -28,6 +29,8 @@ urlpatterns = [
     url(r'^chapter/details/(\d+)$',views.ChapterDetails.as_view(),name='chapter-details'),
     #admin
     url(r'^admin/story/add/$',views.AddStory.as_view(),name='add-story'),
+    url(r'^admin/story/update/(\d+)$',views.UpdateStory.as_view(),name='update-story'),
+    url(r'^admin/chapter/update/(\d+)$',views.UpdateChapter.as_view(),name='update-chapter'),
     url(r'^admin/chapter/add/$',views.AddChapter.as_view(),name='add-chapter'),
     url(r'^admin/tag/add/$',views.AddTag.as_view(),name='add-tag'),
     url(r'^admin/tag/details/(\d+)$',views.TagDetails.as_view(),name='tag-details'),

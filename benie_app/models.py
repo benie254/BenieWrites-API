@@ -10,7 +10,8 @@ class Tag(models.Model):
         return self.tag_name
 
 class Story(models.Model):
-    cover = CloudinaryField('Story Cover',default='')
+    author = models.CharField(max_length=120,default='')
+    cover = models.URLField(max_length=1000,default='')
     title = models.CharField(max_length=120,default='')
     description = models.TextField(max_length=5000,default='')
     CATEGORIES = (('mys','mystery',),('thr','thriller'),('dr','drama'),('mys/thr','mystery/thriller'),('act','action'),('rom','romance'))
@@ -26,10 +27,9 @@ class Story(models.Model):
         return self.title
 
 class Chapter(models.Model):
-    cover = CloudinaryField('Chapter Cover',null=True)
     title = models.CharField(max_length=120,default='')
     description = models.TextField(max_length=5000,default='') 
-    story = models.ForeignKey(Story,on_delete=models.CASCADE,default='')
+    story = models.ForeignKey(Story,on_delete=models.DO_NOTHING,default='',null=True,blank=True)
     uploaded = models.DateTimeField(default=timezone.now)
     first_published = models.DateField(default=timezone.now)
     last_updated = models.DateTimeField(auto_now_add=True,null=True,blank=True)
@@ -39,14 +39,16 @@ class Chapter(models.Model):
 
 class Reaction(models.Model):
     like = models.BooleanField(default='',null=True,blank=True)
-    chapter = models.ForeignKey(Chapter,on_delete=models.CASCADE,default='')
+    chapter = models.ForeignKey(Chapter,on_delete=models.DO_NOTHING,default='')
+    date = models.DateTimeField(default=timezone.now)
 
     def __bool__(self):
         return self.like
 
 class Feedback(models.Model):
     comment = models.TextField(max_length=2500,null=True,blank=True)
-    chapter = models.ForeignKey(Chapter,on_delete=models.CASCADE,default='')
+    chapter = models.ForeignKey(Chapter,on_delete=models.DO_NOTHING,default='')
+    date = models.DateTimeField(default=timezone.now)
 
     def __bool__(self):
         return self.comment

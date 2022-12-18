@@ -20,7 +20,7 @@ def home(request):
 
 class AllStories(APIView):
     def get(self,request):
-        stories = Story.objects.all()
+        stories = Story.objects.all().order_by('-uploaded')
         serializers = StorySerializer(stories,many=True)
         return Response(serializers.data)
 
@@ -196,3 +196,9 @@ class FeedbackDetails(APIView):
         feedback = Feedback.objects.all().filter(pk=id).last()
         feedback.delete()
         return Response(status=status.HTTP_200_OK) 
+
+class StoryChapters(APIView):
+    def get(self,request, id):
+        chapters = Chapter.objects.all().filter(story=id)
+        serializers = ChapterSerializer(chapters,many=True)
+        return Response(serializers.data)

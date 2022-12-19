@@ -68,10 +68,9 @@ class Feedback(models.Model):
         return self.comment
 
 class Notification(models.Model):
-    author = models.CharField(max_length=120,default='')
-    author_pic = models.URLField(max_length=1000,default='')
-    subject = models.CharField(max_length=120,default='')
     message = models.CharField(max_length=1200,default='')
+    date = models.DateTimeField(default=timezone.now)
+
 
 class Subscriber(models.Model):
     name = models.CharField(max_length=220,default='',null=True,blank=True)

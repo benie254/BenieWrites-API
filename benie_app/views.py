@@ -1,13 +1,18 @@
 from django.shortcuts import render
-from benie_app.models import Story, Reaction
+from django.template.loader import render_to_string
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import permission_classes 
 from rest_framework.permissions import IsAdminUser
 
-from benie_app.serializers import StorySerializer, TagSerializer, ReactionSerializer, FeedbackSerializer, ChapterSerializer
-from benie_app.models import Story, Tag, Reaction, Feedback, Chapter
+import sendgrid
+from sendgrid.helpers.mail import * 
+from decouple import config 
+
+from benie_app.serializers import StorySerializer, TagSerializer, ReactionSerializer, FeedbackSerializer, ChapterSerializer, PageSerializer, SubscriberSerializer, NotificationSerializer
+from benie_app.models import Story, Tag, Reaction, Feedback, Chapter, Page, Subscriber, Notification
 
 # Create your views here.
 def landing(request):
@@ -62,10 +67,22 @@ class AllChapters(APIView):
         serializers = ChapterSerializer(chapters,many=True)
         return Response(serializers.data)
 
+class AllPages(APIView):
+    def get(self,request):
+        pages = Page.objects.all()
+        serializers = PageSerializer(pages,many=True)
+        return Response(serializers.data)
+
 class StoryDetails(APIView):
     def get(self,request, id):
         story = Story.objects.all().filter(pk=id).last()
         serializers = StorySerializer(story,many=False)
+        return Response(serializers.data)
+
+class PageDetails(APIView):
+    def get(self,request, id):
+        page = Page.objects.all().filter(pk=id).last()
+        serializers = PageSerializer(page,many=False)
         return Response(serializers.data)
 
 class ChapterDetails(APIView):
@@ -80,6 +97,15 @@ class Reactions(APIView):
         chap_likes = likes.count 
         serializers = ReactionSerializer(chap_likes,many=True)
         return Response(serializers.data)
+
+    def post(self, request):
+        serializers = ReactionSerializer(data=request.data)
+        if serializers.is_valid():
+            serializers.save()
+            return Response(serializers.data,status=status.HTTP_201_CREATED)
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST) 
+
+    
 
 class Feedbacks(APIView):
     def get(self, request, id):
@@ -98,6 +124,15 @@ class AddStory(APIView):
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)  
 
 # @permission_classes([IsAdminUser,])
+class AddPage(APIView):
+    def post(self, request):
+        serializers = PageSerializer(data=request.data)
+        if serializers.is_valid():
+            serializers.save()
+            return Response(serializers.data,status=status.HTTP_201_CREATED)
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)  
+
+# @permission_classes([IsAdminUser,])
 class UpdateStory(APIView):
     def put(self, request, id, format=None):
         story = Story.objects.all().filter(pk=id).last()
@@ -110,6 +145,21 @@ class UpdateStory(APIView):
     def delete(self, request, id, format=None):
         story = Story.objects.all().filter(pk=id).last()
         story.delete()
+        return Response(status=status.HTTP_200_OK) 
+
+# @permission_classes([IsAdminUser,])
+class UpdatePage(APIView):
+    def put(self, request, id, format=None):
+        page = Page.objects.all().filter(pk=id).last()
+        serializers = PageSerializer(page,request.data)
+        if serializers.is_valid():
+            serializers.save()
+            return Response(serializers.data)
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST) 
+
+    def delete(self, request, id, format=None):
+        page = Page.objects.all().filter(pk=id).last()
+        page.delete()
         return Response(status=status.HTTP_200_OK) 
 
 # @permission_classes([IsAdminUser,])
@@ -144,6 +194,8 @@ class AddTag(APIView):
             serializers.save()
             return Response(serializers.data,status=status.HTTP_201_CREATED)
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST) 
+
+
 
 # @permission_classes([IsAdminUser,])
 class TagDetails(APIView):
@@ -199,6 +251,116 @@ class FeedbackDetails(APIView):
 
 class StoryChapters(APIView):
     def get(self,request, id):
-        chapters = Chapter.objects.all().filter(story=id)
+        chapters = Chapter.objects.all().filter(story=id).order_by('first_published')
         serializers = ChapterSerializer(chapters,many=True)
         return Response(serializers.data)
+
+class StoryReactions(APIView):
+    def get(self, request, id):
+        reactions = Reaction.objects.all().filter(story=id).filter(like='like')
+        serializers = ReactionSerializer(reactions,many=True)
+        return Response(serializers.data)
+
+class StoryFeedbacks(APIView):
+    def get(self, request, id):
+        feedbacks = Feedback.objects.all().filter(story=id)
+        serializers = FeedbackSerializer(feedbacks,many=True)
+        return Response(serializers.data)
+
+class ChapterPages(APIView):
+    def get(self,request, id):
+        pages = Page.objects.all().filter(chapter=id).order_by('uploaded')
+        serializers = PageSerializer(pages,many=True)
+        return Response(serializers.data)
+
+class AllSubscribers(APIView):
+    # permission_classes = (IsAdminUser,IsAuthenticated)
+    def get(self,request,format=None):
+        subscribers = Subscriber.objects.all().order_by('date_subscribed')
+        serializers = SubscriberSerializer(subscribers,many=True)
+        return Response(serializers.data)
+
+    # permission_classes = (AllowAny)
+    def post(self,request,format=None):
+        serializers = SubscriberSerializer(data=request.data)
+        if serializers.is_valid():
+            name = serializers.validated_data['name']
+            email = serializers.validated_data['email']
+            serializers.save()
+            sg = sendgrid.SendGridAPIClient(api_key=config('SENDGRID_API_KEY'))
+            msg = render_to_string('email/new-subscriber.html', {
+                'name': name,
+                'email': email,
+            })
+            message = Mail(
+                from_email = Email("davinci.monalissa@gmail.com"),
+                to_emails = 'beniewrites@gmail.com',
+                subject = "New Subscriber",
+                html_content= msg
+            )
+            try:
+                sendgrid_client = sendgrid.SendGridAPIClient(config('SENDGRID_API_KEY'))
+                response = sendgrid_client.send(message)
+                print(response.status_code)
+                print(response.body)
+                print(response.headers)
+            except Exception as e:
+                print(e)
+
+            msg2 = render_to_string('email/welcome-subscriber.html', {
+                'name': name,
+                'email': email,
+            })
+            message2 = Mail(
+                from_email = Email("davinci.monalissa@gmail.com"),
+                to_emails = email,
+                subject = "Monthly Newsletter",
+                html_content= msg2
+            )
+            try:
+                sendgrid_client = sendgrid.SendGridAPIClient(config('SENDGRID_API_KEY'))
+                response = sendgrid_client.send(message2)
+                print(response.status_code)
+                print(response.body)
+                print(response.headers)
+            except Exception as e:
+                print(e)
+            status_code = status.HTTP_201_CREATED
+            response = {
+                'success' : 'True',
+                'status code' : status_code,
+                }
+            return Response(serializers.data, status=status.HTTP_201_CREATED)
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class Notifications(APIView):
+    def get(self,request):
+        notifications = Notification.objects.all()
+        serializers = NotificationSerializer(notifications,many=True)
+        return Response(serializers.data)
+
+    def post(self, request, format=None):
+        serializers = NotificationSerializer(data=request.data)
+        if serializers.is_valid():
+            serializers.save()
+            return Response(serializers.data)
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST) 
+
+class NotificationDetails(APIView):
+    def get(self,request,id):
+        notification = Notification.objects.all().filter(pk=id).last()
+        serializers = NotificationSerializer(notification,many=False)
+        return Response(serializers.data)
+
+    def put(self, request, id, format=None):
+        notification = Notification.objects.all().filter(pk=id).last()
+        serializers = NotificationSerializer(notification,request.data)
+        if serializers.is_valid():
+            serializers.save()
+            return Response(serializers.data)
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST) 
+
+    def delete(self, request, id, format=None):
+        notification = Notification.objects.all().filter(pk=id).last()
+        notification.delete()
+        return Response(status=status.HTTP_200_OK) 

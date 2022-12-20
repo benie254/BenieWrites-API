@@ -98,7 +98,7 @@ CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:4200',
     'http://127.0.0.1:8000',
-    'https://benie-writes.web.app',
+    'https://benie.web.app',
     'https://benie-writes.web.app',
     'https://beniewrites-api-production.up.railway.app'
 )

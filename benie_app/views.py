@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.template.loader import render_to_string
+from django.db.models import Sum
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -280,6 +281,10 @@ class StoryFeedbacks(APIView):
 class ChapterPages(APIView):
     def get(self,request, id):
         pages = Page.objects.all().filter(chapter=id).order_by('uploaded')
+        chap = Chapter.objects.all().filter(pk=id).last()
+        chap.words = pages.aggregate(TOTAL=Sum('words'))['TOTAL']
+        chap.save()
+        chap.refresh_from_db()
         serializers = PageSerializer(pages,many=True)
         return Response(serializers.data)
 

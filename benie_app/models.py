@@ -33,6 +33,7 @@ class Chapter(models.Model):
     uploaded = models.DateTimeField(default=timezone.now)
     first_published = models.DateField(default=timezone.now)
     last_updated = models.DateTimeField(auto_now_add=True,null=True,blank=True)
+    words = models.PositiveIntegerField(null=True,blank=True)
 
     def __str__(self):
         return self.title
@@ -43,6 +44,7 @@ class Page(models.Model):
     story = models.ForeignKey(Story,on_delete=models.CASCADE,default='',null=True,blank=True)
     chapter = models.ForeignKey(Chapter,on_delete=models.CASCADE,default='',null=True,blank=True)
     uploaded = models.DateTimeField(default=timezone.now)
+    words = models.PositiveIntegerField(null=True,blank=True)
 
     def __description__(self):
         return self.title

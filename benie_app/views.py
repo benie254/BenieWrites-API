@@ -25,7 +25,19 @@ def home(request):
 
 class AllStories(APIView):
     def get(self,request):
-        stories = Story.objects.all().order_by('-uploaded')
+        stories = Story.objects.all().order_by('-first_published')
+        serializers = StorySerializer(stories,many=True)
+        return Response(serializers.data)
+
+class OngoingStories(APIView):
+    def get(self,request):
+        stories = Story.objects.all().filter(status='ongoing').order_by('-first_published')
+        serializers = StorySerializer(stories,many=True)
+        return Response(serializers.data)
+
+class CompletedStories(APIView):
+    def get(self,request):
+        stories = Story.objects.all().filter(status='completed').order_by('-first_published')
         serializers = StorySerializer(stories,many=True)
         return Response(serializers.data)
 
@@ -37,7 +49,7 @@ class AllTags(APIView):
 
 class AllFeedbacks(APIView):
     def get(self,request):
-        feedbacks = Feedback.objects.all()
+        feedbacks = Feedback.objects.all().order_by('-date')
         serializers = FeedbackSerializer(feedbacks,many=True)
         return Response(serializers.data)
 
@@ -263,7 +275,7 @@ class StoryReactions(APIView):
 
 class StoryFeedbacks(APIView):
     def get(self, request, id):
-        feedbacks = Feedback.objects.all().filter(story=id)
+        feedbacks = Feedback.objects.all().filter(story=id).order_by('-date')
         serializers = FeedbackSerializer(feedbacks,many=True)
         return Response(serializers.data)
 
@@ -335,7 +347,7 @@ class AllSubscribers(APIView):
 
 class Notifications(APIView):
     def get(self,request):
-        notifications = Notification.objects.all()
+        notifications = Notification.objects.all().order_by('-date')
         serializers = NotificationSerializer(notifications,many=True)
         return Response(serializers.data)
 
@@ -363,4 +375,23 @@ class NotificationDetails(APIView):
     def delete(self, request, id, format=None):
         notification = Notification.objects.all().filter(pk=id).last()
         notification.delete()
+        return Response(status=status.HTTP_200_OK) 
+
+class SubscriberDetails(APIView):
+    def get(self,request,id):
+        subscriber = Subscriber.objects.all().filter(pk=id).last()
+        serializers = SubscriberSerializer(subscriber,many=False)
+        return Response(serializers.data)
+
+    def put(self, request, id, format=None):
+        subscriber = Subscriber.objects.all().filter(pk=id).last()
+        serializers = SubscriberSerializer(subscriber,request.data)
+        if serializers.is_valid():
+            serializers.save()
+            return Response(serializers.data)
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST) 
+
+    def delete(self, request, id, format=None):
+        subscriber = Subscriber.objects.all().filter(pk=id).last()
+        subscriber.delete()
         return Response(status=status.HTTP_200_OK) 

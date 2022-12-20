@@ -20,6 +20,8 @@ from benie_app import views
 urlpatterns = [
     path('', views.home, name='home'),
     url(r'^stories/all/$',views.AllStories.as_view(),name='all-stories'),
+    url(r'^stories/ongoing/$',views.OngoingStories.as_view(),name='ongoing-stories'),
+    url(r'^stories/completed/$',views.CompletedStories.as_view(),name='completed-stories'),
     url(r'^story/details/(\d+)$',views.StoryDetails.as_view(),name='story-details'),
     url(r'^story/chapters/(\d+)$',views.StoryChapters.as_view(),name='story-chapters'),
     url(r'^tags/all/$',views.AllTags.as_view(),name='all-tags'),
@@ -34,7 +36,8 @@ urlpatterns = [
     url(r'^chapter/details/(\d+)$',views.PageDetails.as_view(),name='chapter-details'),
     url(r'^newsletter/subscribers/$',views.AllSubscribers.as_view(),name='newsletter-subscribers'),
     #admin
-    url(r'^notification/details/(\d+)$',views.NotificationDetails.as_view(),name='notification-details'),
+    url(r'^admin/notification/details/(\d+)$',views.NotificationDetails.as_view(),name='notification-details'),
+    url(r'^admin/subscriber/details/(\d+)$',views.SubscriberDetails.as_view(),name='subscriber-details'),
     url(r'^admin/pages/all/$',views.AllPages.as_view(),name='all-pages'),
     url(r'^admin/story/add/$',views.AddStory.as_view(),name='add-story'),
     url(r'^admin/tag/add/$',views.AddTag.as_view(),name='add-tag'),

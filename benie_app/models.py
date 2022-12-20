@@ -68,6 +68,7 @@ class Feedback(models.Model):
         return self.comment
 
 class Notification(models.Model):
+    subject = models.CharField(max_length=60,default='',null=True,blank=True)
     message = models.CharField(max_length=1200,default='')
     date = models.DateTimeField(default=timezone.now)
 

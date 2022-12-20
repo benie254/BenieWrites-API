@@ -106,8 +106,7 @@ class ChapterDetails(APIView):
 class Reactions(APIView):
     def get(self, request, id):
         likes = Reaction.objects.all().filter(chapter=id)
-        chap_likes = likes.count 
-        serializers = ReactionSerializer(chap_likes,many=True)
+        serializers = ReactionSerializer(likes,many=True)
         return Response(serializers.data)
 
     def post(self, request):
@@ -122,8 +121,7 @@ class Reactions(APIView):
 class Feedbacks(APIView):
     def get(self, request, id):
         comments = Feedback.objects.all().filter(chapter=id)
-        chap_comments = comments.count 
-        serializers = FeedbackSerializer(chap_comments,many=True)
+        serializers = FeedbackSerializer(comments,many=True)
         return Response(serializers.data)
 
 # @permission_classes([IsAdminUser,])

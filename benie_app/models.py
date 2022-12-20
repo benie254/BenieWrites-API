@@ -23,6 +23,7 @@ class Story(models.Model):
     STATUSES = (('completed','completed'),('ongoing','ongoing'))
     status = models.CharField(max_length=60,choices=STATUSES,default='')
     last_updated = models.DateTimeField(auto_now_add=True,null=True,blank=True)
+    words = models.PositiveIntegerField(null=True,blank=True)
 
     def __str__(self):
         return self.title

@@ -263,6 +263,10 @@ class FeedbackDetails(APIView):
 class StoryChapters(APIView):
     def get(self,request, id):
         chapters = Chapter.objects.all().filter(story=id).order_by('first_published')
+        story = Story.objects.all().filter(pk=id).last()
+        story.words = chapters.aggregate(TOTAL=Sum('words'))['TOTAL']
+        story.save()
+        story.refresh_from_db()
         serializers = ChapterSerializer(chapters,many=True)
         return Response(serializers.data)
 

@@ -262,7 +262,7 @@ class FeedbackDetails(APIView):
 
 class StoryChapters(APIView):
     def get(self,request, id):
-        chapters = Chapter.objects.all().filter(story=id).order_by('first_published')
+        chapters = Chapter.objects.all().filter(story=id).order_by('pk')
         story = Story.objects.all().filter(pk=id).last()
         if story:
             story.words = chapters.aggregate(TOTAL=Sum('words'))['TOTAL']
@@ -285,7 +285,7 @@ class StoryFeedbacks(APIView):
 
 class ChapterPages(APIView):
     def get(self,request, id):
-        pages = Page.objects.all().filter(chapter=id).order_by('uploaded')
+        pages = Page.objects.all().filter(chapter=id).order_by('pk')
         chap = Chapter.objects.all().filter(pk=id).last()
         if chap:
             chap.words = pages.aggregate(TOTAL=Sum('words'))['TOTAL']

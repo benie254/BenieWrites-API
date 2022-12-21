@@ -264,9 +264,10 @@ class StoryChapters(APIView):
     def get(self,request, id):
         chapters = Chapter.objects.all().filter(story=id).order_by('first_published')
         story = Story.objects.all().filter(pk=id).last()
-        story.words = chapters.aggregate(TOTAL=Sum('words'))['TOTAL']
-        story.save()
-        story.refresh_from_db()
+        if story:
+            story.words = chapters.aggregate(TOTAL=Sum('words'))['TOTAL']
+            story.save()
+            story.refresh_from_db()
         serializers = ChapterSerializer(chapters,many=True)
         return Response(serializers.data)
 
@@ -286,9 +287,10 @@ class ChapterPages(APIView):
     def get(self,request, id):
         pages = Page.objects.all().filter(chapter=id).order_by('uploaded')
         chap = Chapter.objects.all().filter(pk=id).last()
-        chap.words = pages.aggregate(TOTAL=Sum('words'))['TOTAL']
-        chap.save()
-        chap.refresh_from_db()
+        if chap:
+            chap.words = pages.aggregate(TOTAL=Sum('words'))['TOTAL']
+            chap.save()
+            chap.refresh_from_db()
         serializers = PageSerializer(pages,many=True)
         return Response(serializers.data)
 

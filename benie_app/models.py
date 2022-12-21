@@ -74,9 +74,27 @@ class Notification(models.Model):
     subject = models.CharField(max_length=60,default='',null=True,blank=True)
     message = models.CharField(max_length=1200,default='')
     date = models.DateTimeField(default=timezone.now)
+    link = models.URLField(max_length=1000,null=True,blank=True)
+    img = models.URLField(max_length=1000,null=True,blank=True)
 
+    def __str__(self):
+        return self.subject
 
 class Subscriber(models.Model):
     name = models.CharField(max_length=220,default='',null=True,blank=True)
     email = models.EmailField(max_length=220,default='',null=True,blank=True,unique=True)
     date_subscribed = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.name
+
+class Contact(models.Model):
+    name = models.CharField(max_length=220,default='',null=True,blank=True)
+    email = models.EmailField(max_length=220,default='',null=True,blank=True)
+    message = models.TextField(max_length=9000,null=True,blank=True)
+    date = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.name
+
+

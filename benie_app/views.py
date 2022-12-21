@@ -12,8 +12,8 @@ import sendgrid
 from sendgrid.helpers.mail import * 
 from decouple import config 
 
-from benie_app.serializers import StorySerializer, TagSerializer, ReactionSerializer, FeedbackSerializer, ChapterSerializer, PageSerializer, SubscriberSerializer, NotificationSerializer
-from benie_app.models import Story, Tag, Reaction, Feedback, Chapter, Page, Subscriber, Notification
+from benie_app.serializers import StorySerializer, TagSerializer, ReactionSerializer, FeedbackSerializer, ChapterSerializer, PageSerializer, SubscriberSerializer, NotificationSerializer, ContactSerializer
+from benie_app.models import Story, Tag, Reaction, Feedback, Chapter, Page, Subscriber, Notification, Contact
 
 # Create your views here.
 def landing(request):
@@ -384,6 +384,84 @@ class NotificationDetails(APIView):
     def delete(self, request, id, format=None):
         notification = Notification.objects.all().filter(pk=id).last()
         notification.delete()
+        return Response(status=status.HTTP_200_OK) 
+
+class Contacts(APIView):
+    def get(self,request):
+        contacts = Contact.objects.all().order_by('-date')
+        serializers = ContactSerializer(contacts,many=True)
+        return Response(serializers.data)
+
+    def post(self, request, format=None):
+        serializers = ContactSerializer(data=request.data)
+        if serializers.is_valid():
+            name = serializers.validated_data['name']
+            email = serializers.validated_data['email']
+            message = serializers.validated_data['message']
+            serializers.save()
+            sg = sendgrid.SendGridAPIClient(api_key=config('SENDGRID_API_KEY'))
+            msg = render_to_string('email/new-contact.html', {
+                'name': name,
+                'email': email,
+                "message": message,
+            })
+            message = Mail(
+                from_email = Email("davinci.monalissa@gmail.com"),
+                to_emails = 'beniewrites@gmail.com',
+                subject = "New Contact",
+                html_content= msg
+            )
+            try:
+                sendgrid_client = sendgrid.SendGridAPIClient(config('SENDGRID_API_KEY'))
+                response = sendgrid_client.send(message)
+                print(response.status_code)
+                print(response.body)
+                print(response.headers)
+            except Exception as e:
+                print(e)
+
+            msg2 = render_to_string('email/message-delivered.html', {
+                'name': name,
+            })
+            message2 = Mail(
+                from_email = Email("davinci.monalissa@gmail.com"),
+                to_emails = email,
+                subject = "Message Delivered",
+                html_content= msg2
+            )
+            try:
+                sendgrid_client = sendgrid.SendGridAPIClient(config('SENDGRID_API_KEY'))
+                response = sendgrid_client.send(message2)
+                print(response.status_code)
+                print(response.body)
+                print(response.headers)
+            except Exception as e:
+                print(e)
+            status_code = status.HTTP_201_CREATED
+            response = {
+                'success' : 'True',
+                'status code' : status_code,
+                }
+            return Response(serializers.data)
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST) 
+
+class ContactDetails(APIView):
+    def get(self,request,id):
+        contact = Contact.objects.all().filter(pk=id).last()
+        serializers = ContactSerializer(contact,many=False)
+        return Response(serializers.data)
+
+    def put(self, request, id, format=None):
+        contact = Contact.objects.all().filter(pk=id).last()
+        serializers = ContactSerializer(contact,request.data)
+        if serializers.is_valid():
+            serializers.save()
+            return Response(serializers.data)
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST) 
+
+    def delete(self, request, id, format=None):
+        contact = Contact.objects.all().filter(pk=id).last()
+        contact.delete()
         return Response(status=status.HTTP_200_OK) 
 
 class SubscriberDetails(APIView):

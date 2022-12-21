@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from benie_app.models import Story, Tag, Chapter, Reaction, Feedback, Page, Subscriber, Notification
+from benie_app.models import Story, Tag, Chapter, Reaction, Feedback, Page, Subscriber, Notification, Contact
 
 
 class StorySerializer(serializers.ModelSerializer):
@@ -41,4 +41,9 @@ class SubscriberSerializer(serializers.ModelSerializer):
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
+        fields = ('__all__')
+
+class ContactSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Contact
         fields = ('__all__')

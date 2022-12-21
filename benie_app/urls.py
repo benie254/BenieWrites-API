@@ -36,6 +36,8 @@ urlpatterns = [
     url(r'^chapter/details/(\d+)$',views.PageDetails.as_view(),name='chapter-details'),
     url(r'^newsletter/subscribers/$',views.AllSubscribers.as_view(),name='newsletter-subscribers'),
     #admin
+    url(r'^admin/contacts/all/$',views.Contacts.as_view(),name='contacts'),
+    url(r'^admin/contact/details/(\d+)$',views.ContactDetails.as_view(),name='contact-details'),
     url(r'^admin/notification/details/(\d+)$',views.NotificationDetails.as_view(),name='notification-details'),
     url(r'^admin/subscriber/details/(\d+)$',views.SubscriberDetails.as_view(),name='subscriber-details'),
     url(r'^admin/pages/all/$',views.AllPages.as_view(),name='all-pages'),

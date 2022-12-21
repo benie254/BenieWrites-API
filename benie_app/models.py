@@ -53,8 +53,8 @@ class Page(models.Model):
 class Reaction(models.Model):
     REACTIONS = (('like','like'),('dislike','dislike'))
     like = models.CharField(choices=REACTIONS,max_length=60,default='',null=True,blank=True)
-    story = models.ForeignKey(Story,on_delete=models.DO_NOTHING,default='',null=True,blank=True)
-    chapter = models.ForeignKey(Chapter,on_delete=models.DO_NOTHING,default='',null=True,blank=True)
+    story = models.ForeignKey(Story,on_delete=models.CASCADE,default='',null=True,blank=True)
+    chapter = models.ForeignKey(Chapter,on_delete=models.CASCADE,default='',null=True,blank=True)
     date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
@@ -63,8 +63,8 @@ class Reaction(models.Model):
 class Feedback(models.Model):
     comment = models.TextField(max_length=2500,null=True,blank=True)
     commented_by = models.CharField(max_length=120,null=True,blank=True)
-    story = models.ForeignKey(Story,on_delete=models.DO_NOTHING,default='',null=True,blank=True)
-    chapter = models.ForeignKey(Chapter,on_delete=models.DO_NOTHING,default='',null=True,blank=True)
+    story = models.ForeignKey(Story,on_delete=models.CASCADE,default='',null=True,blank=True)
+    chapter = models.ForeignKey(Chapter,on_delete=models.CASCADE,default='',null=True,blank=True)
     date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):

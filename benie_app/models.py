@@ -57,8 +57,10 @@ class Poem(models.Model):
     description = models.TextField(max_length=5000,default='') 
     uploaded = models.DateTimeField(default=timezone.now)
     words = models.PositiveIntegerField(null=True,blank=True)
-    CATEGORIES = (('Spoken Word','Spoken Word',),('Poetic Chains','Poetic Chains'),('Poetic Notes','Poetic Notes'),('One-Liners','One-Liners'))
+    CATEGORIES = (('Spoken Word','Spoken Word',),('Poetic Chains','Poetic Chains'),('Poetic Notes','Poetic Notes'),('One-Liners','One-Liners'),('Poem','Poem'))
     category = models.CharField(max_length=60,choices=CATEGORIES,default='')
+    TAGS = (('love','love',),('life','life'))
+    tag = models.CharField(max_length=60,choices=TAGS,default='')
     STATUS = (('pinned','pinned'),('unpinned','unpinned'))
     status = models.CharField(choices=STATUS,max_length=60,default='',null=True,blank=True)
 

@@ -91,7 +91,7 @@ class AllPages(APIView):
 
 class AllPoems(APIView):
     def get(self,request):
-        poems = Poem.objects.all()
+        poems = Poem.objects.all().order_by('-uploaded')
         serializers = PoemSerializer(poems,many=True)
         return Response(serializers.data)
 
@@ -99,6 +99,12 @@ class PinnedPoem(APIView):
     def get(self,request):
         poems = Poem.objects.all().filter(status='pinned').last()
         serializers = PoemSerializer(poems,many=False)
+        return Response(serializers.data)
+
+class RelatedPoems(APIView):
+    def get(self,request, category):
+        poems = Poem.objects.all().filter(category=category).order_by('title')
+        serializers = PoemSerializer(poems,many=True)
         return Response(serializers.data)
 
 class StoryDetails(APIView):
@@ -556,7 +562,6 @@ class PastPoems(APIView):
             poems = Poem.objects.filter(uploaded=today)
             serializers = PoemSerializer(poems,many=True)
             return Response(serializers.data)
-
         poems = Poem.objects.filter(uploaded=date)
         serializers = PoemSerializer(poems,many=True)
         return Response(serializers.data)

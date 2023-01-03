@@ -37,6 +37,7 @@ urlpatterns = [
     url(r'^newsletter/subscribers/$',views.AllSubscribers.as_view(),name='newsletter-subscribers'),
     url(r'^poems/all/$',views.AllPoems.as_view(),name='all-poems'),
     url(r'^poem/details/(\d+)$',views.PoemDetails.as_view(),name='poem-details'),
+    url(r'^poem/pinned/$',views.PinnedPoem.as_view(),name='pinned-poem'),
     url(r'^poem/reactions/(\d+)$',views.PoemReactions.as_view(),name='poem-reactions'),
     url(r'^poem/feedbacks/(\d+)$',views.PoemFeedbacks.as_view(),name='poem-feedbacks'),
     url(r'^poems/past/(\d{4}-\d{2}-\d{2})$',views.PastPoems.as_view(),name='past-poems'),

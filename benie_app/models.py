@@ -53,6 +53,7 @@ class Page(models.Model):
 
 class Poem(models.Model):
     title = models.CharField(max_length=120,default='')
+    cover = models.URLField(max_length=1000,default='')
     description = models.TextField(max_length=5000,default='') 
     uploaded = models.DateTimeField(default=timezone.now)
     words = models.PositiveIntegerField(null=True,blank=True)

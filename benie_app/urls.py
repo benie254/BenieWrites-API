@@ -39,4 +39,5 @@ urlpatterns = [
     url(r'^poem/details/(\d+)$',views.PoemDetails.as_view(),name='poem-details'),
     url(r'^poem/reactions/(\d+)$',views.PoemReactions.as_view(),name='poem-reactions'),
     url(r'^poem/feedbacks/(\d+)$',views.PoemFeedbacks.as_view(),name='poem-feedbacks'),
+    url(r'^poems/past/(\d{4}-\d{2}-\d{2})$',views.PastPoems.as_view(),name='past-poems'),
 ]

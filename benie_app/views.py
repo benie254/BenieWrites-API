@@ -1,6 +1,9 @@
 from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.db.models import Sum
+from django.http import Http404 
+
+import datetime as dt
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -529,3 +532,25 @@ class SubscriberDetails(APIView):
         subscriber = Subscriber.objects.all().filter(pk=id).last()
         subscriber.delete()
         return Response(status=status.HTTP_200_OK) 
+
+
+class PastPoems(APIView):
+    def get(self,request,past_date):
+        try:
+        # convert data from the string url
+            date = dt.datetime.strptime(past_date, '%Y-%m-%d').date()
+
+        except ValueError:
+            # raise 404 when value error is thrown
+            raise Http404()
+            assert False
+
+        if date == dt.date.today():
+            today = dt.date.today()
+            poems = Poem.objects.filter(uploaded=today)
+            serializers = PoemSerializer(poems,many=True)
+            return Response(serializers.data)
+
+        poems = Poem.objects.filter(uploaded=date)
+        serializers = PoemSerializer(poems,many=True)
+        return Response(serializers.data)

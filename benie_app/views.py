@@ -95,6 +95,12 @@ class AllPoems(APIView):
         serializers = PoemSerializer(poems,many=True)
         return Response(serializers.data)
 
+class PinnedPoem(APIView):
+    def get(self,request):
+        poems = Poem.objects.all().filter(status='pinned').last()
+        serializers = PoemSerializer(poems,many=False)
+        return Response(serializers.data)
+
 class StoryDetails(APIView):
     def get(self,request, id):
         story = Story.objects.all().filter(pk=id).last()

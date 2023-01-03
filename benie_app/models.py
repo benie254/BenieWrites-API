@@ -54,6 +54,7 @@ class Page(models.Model):
 class Poem(models.Model):
     title = models.CharField(max_length=120,default='')
     cover = models.URLField(max_length=1000,default='')
+    cover_att = models.CharField(max_length=50,default='')
     excerpt = models.TextField(max_length=2000,default='') 
     description = models.TextField(max_length=5000,default='') 
     uploaded = models.DateTimeField(default=timezone.now)

@@ -41,6 +41,7 @@ class Chapter(models.Model):
 
 class Page(models.Model):
     title = models.CharField(max_length=120,default='')
+    cover = models.URLField(max_length=1000,default='')
     description = models.TextField(max_length=5000,default='') 
     story = models.ForeignKey(Story,on_delete=models.CASCADE,default='',null=True,blank=True)
     chapter = models.ForeignKey(Chapter,on_delete=models.CASCADE,default='',null=True,blank=True)
@@ -50,11 +51,25 @@ class Page(models.Model):
     def __description__(self):
         return self.title
 
+class Poem(models.Model):
+    title = models.CharField(max_length=120,default='')
+    description = models.TextField(max_length=5000,default='') 
+    uploaded = models.DateTimeField(default=timezone.now)
+    words = models.PositiveIntegerField(null=True,blank=True)
+    CATEGORIES = (('Spoken Word','Spoken Word',),('Poetic Chains','Poetic Chains'),('Poetic Notes','Poetic Notes'),('One-Liners','One-Liners'))
+    category = models.CharField(max_length=60,choices=CATEGORIES,default='')
+    STATUS = (('pinned','pinned'),('unpinned','unpinned'))
+    status = models.CharField(choices=STATUS,max_length=60,default='',null=True,blank=True)
+
+    def __description__(self):
+        return self.title
+
 class Reaction(models.Model):
     REACTIONS = (('like','like'),('dislike','dislike'))
     like = models.CharField(choices=REACTIONS,max_length=60,default='',null=True,blank=True)
     story = models.ForeignKey(Story,on_delete=models.CASCADE,default='',null=True,blank=True)
     chapter = models.ForeignKey(Chapter,on_delete=models.CASCADE,default='',null=True,blank=True)
+    poem = models.ForeignKey(Poem,on_delete=models.CASCADE,default='',null=True,blank=True)
     date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
@@ -65,6 +80,7 @@ class Feedback(models.Model):
     commented_by = models.CharField(max_length=120,null=True,blank=True)
     story = models.ForeignKey(Story,on_delete=models.CASCADE,default='',null=True,blank=True)
     chapter = models.ForeignKey(Chapter,on_delete=models.CASCADE,default='',null=True,blank=True)
+    poem = models.ForeignKey(Poem,on_delete=models.CASCADE,default='',null=True,blank=True)
     date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):

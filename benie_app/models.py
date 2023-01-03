@@ -60,7 +60,7 @@ class Poem(models.Model):
     CATEGORIES = (('Spoken Word','Spoken Word',),('Poetic Chains','Poetic Chains'),('Poetic Notes','Poetic Notes'),('One-Liners','One-Liners'),('Poem','Poem'))
     category = models.CharField(max_length=60,choices=CATEGORIES,default='')
     TAGS = (('love','love',),('life','life'))
-    tag = models.CharField(max_length=60,choices=TAGS,default='')
+    tag = models.CharField(max_length=60,choices=TAGS,default='',null=True,blank=True)
     STATUS = (('pinned','pinned'),('unpinned','unpinned'))
     status = models.CharField(choices=STATUS,max_length=60,default='',null=True,blank=True)
 

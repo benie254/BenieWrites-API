@@ -547,21 +547,9 @@ class SubscriberDetails(APIView):
 
 
 class PastPoems(APIView):
-    def get(self,request,past_date):
-        try:
-        # convert data from the string url
-            date = dt.datetime.strptime(past_date, '%Y-%m-%d').date()
-
-        except ValueError:
-            # raise 404 when value error is thrown
-            raise Http404()
-            assert False
-
-        if date == dt.date.today():
-            today = dt.date.today()
-            poems = Poem.objects.filter(uploaded=today)
+    def get(self,request,date):
+        poems = Poem.search(date)
+        if poems:
             serializers = PoemSerializer(poems,many=True)
             return Response(serializers.data)
-        poems = Poem.objects.filter(uploaded=date)
-        serializers = PoemSerializer(poems,many=True)
-        return Response(serializers.data)
+        return Response(status=status.HTTP_204_NO_CONTENT)

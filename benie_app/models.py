@@ -1,6 +1,8 @@
 from django.db import models
 from cloudinary.models import CloudinaryField
 from django.utils import timezone
+import datetime as dt
+from django.http import Http404
 
 # Create your models here.
 class Tag(models.Model):
@@ -57,9 +59,9 @@ class Poem(models.Model):
     cover_source = models.URLField(max_length=50,default='')
     excerpt = models.TextField(max_length=2000,default='') 
     description = models.TextField(max_length=5000,default='') 
-    uploaded = models.DateTimeField(default=timezone.now)
+    uploaded = models.DateTimeField(auto_now_add=True)
     words = models.PositiveIntegerField(null=True,blank=True)
-    CATEGORIES = (('Spoken Word','Spoken Word',),('Poetic Chains','Poetic Chains'),('Poetic Notes','Poetic Notes'),('One-Liners','One-Liners'),('Poem','Poem'))
+    CATEGORIES = (('Spoken-Word','Spoken-Word',),('Poetic-Chains','Poetic-Chains'),('Poetic-Notes','Poetic-Notes'),('One-Liners','One-Liners'),('Poems','Poems'))
     category = models.CharField(max_length=60,choices=CATEGORIES,default='')
     TAGS = (('love','love',),('life','life'))
     tag = models.CharField(max_length=60,choices=TAGS,default='',null=True,blank=True)
@@ -68,6 +70,20 @@ class Poem(models.Model):
 
     def __description__(self):
         return self.title
+
+    @classmethod 
+    def search(cls, past_date):
+        try:
+        # convert data from the string url
+            date = dt.datetime.strptime(past_date, '%Y-%m-%d').date()
+
+        except ValueError:
+            # raise 404 when value error is thrown
+            raise Http404()
+            assert False
+            
+        poems = cls.objects.filter(uploaded__date=date)
+        return poems
 
 class Reaction(models.Model):
     REACTIONS = (('like','like'),('dislike','dislike'))

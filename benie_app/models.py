@@ -67,6 +67,7 @@ class Poem(models.Model):
     tag = models.CharField(max_length=60,choices=TAGS,default='',null=True,blank=True)
     STATUS = (('pinned','pinned'),('unpinned','unpinned'))
     status = models.CharField(choices=STATUS,max_length=60,default='',null=True,blank=True)
+    likes = models.IntegerField(null=True,blank=True)
 
     def __description__(self):
         return self.title
@@ -85,23 +86,37 @@ class Poem(models.Model):
         poems = cls.objects.filter(uploaded__date=date)
         return poems
 
-class Reaction(models.Model):
-    REACTIONS = (('like','like'),('dislike','dislike'))
-    like = models.CharField(choices=REACTIONS,max_length=60,default='',null=True,blank=True)
-    story = models.ForeignKey(Story,on_delete=models.CASCADE,default='',null=True,blank=True)
-    chapter = models.ForeignKey(Chapter,on_delete=models.CASCADE,default='',null=True,blank=True)
-    poem = models.ForeignKey(Poem,on_delete=models.CASCADE,default='',null=True,blank=True)
-    date = models.DateTimeField(default=timezone.now)
-
-    def __str__(self):
-        return self.like
-
 class Feedback(models.Model):
     comment = models.TextField(max_length=2500,null=True,blank=True)
     commented_by = models.CharField(max_length=120,null=True,blank=True)
     story = models.ForeignKey(Story,on_delete=models.CASCADE,default='',null=True,blank=True)
     chapter = models.ForeignKey(Chapter,on_delete=models.CASCADE,default='',null=True,blank=True)
     poem = models.ForeignKey(Poem,on_delete=models.CASCADE,default='',null=True,blank=True)
+    likes = models.IntegerField(null=True,blank=True)
+    date = models.DateTimeField(default=timezone.now)
+    replies = models.IntegerField(null=True,blank=True)
+
+    def __str__(self):
+        return self.comment
+
+class Reaction(models.Model):
+    REACTIONS = (('like','like'),('dislike','dislike'))
+    like = models.CharField(choices=REACTIONS,max_length=60,default='',null=True,blank=True)
+    story = models.ForeignKey(Story,on_delete=models.CASCADE,default='',null=True,blank=True)
+    chapter = models.ForeignKey(Chapter,on_delete=models.CASCADE,default='',null=True,blank=True)
+    poem = models.ForeignKey(Poem,on_delete=models.CASCADE,default='',null=True,blank=True)
+    comment = models.ForeignKey(Feedback,on_delete=models.CASCADE,default='',null=True,blank=True)
+    date = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.like
+
+
+
+class Reply(models.Model):
+    msg = models.TextField(max_length=2500,null=True,blank=True)
+    replied_by = models.CharField(max_length=120,null=True,blank=True)
+    comment = models.ForeignKey(Feedback,on_delete=models.CASCADE,default='',null=True,blank=True)
     date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):

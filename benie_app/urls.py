@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^story/chapters/(\d+)$',views.StoryChapters.as_view(),name='story-chapters'),
     url(r'^tags/all/$',views.AllTags.as_view(),name='all-tags'),
     url(r'^feedbacks/all/$',views.AllFeedbacks.as_view(),name='all-feedbacks'),
+    url(r'^replies/all/$',views.AllReplies.as_view(),name='all-replies'),
     url(r'^story/feedbacks/(\d+)$',views.StoryFeedbacks.as_view(),name='story-feedbacks'),
     url(r'^reactions/all/$',views.AllRecations.as_view(),name='all-reactions'),
     url(r'^notifications/all/$',views.Notifications.as_view(),name='notifications'),
@@ -41,5 +42,7 @@ urlpatterns = [
     url(r'^poem/pinned/$',views.PinnedPoem.as_view(),name='pinned-poem'),
     url(r'^poem/reactions/(\d+)$',views.PoemReactions.as_view(),name='poem-reactions'),
     url(r'^poem/feedbacks/(\d+)$',views.PoemFeedbacks.as_view(),name='poem-feedbacks'),
+    url(r'^poem/feedback/replies/(\d+)$',views.PoemFeedbackReplies.as_view(),name='poem-feedback-replies'),
+    url(r'^poem/feedback/likes/(\d+)$',views.PoemFeedbackLikes.as_view(),name='poem-feedback-likes'),
     url(r'^poems/past/(\d{4}-\d{2}-\d{2})$',views.PastPoems.as_view(),name='past-poems'),
 ]

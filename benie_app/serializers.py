@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from benie_app.models import Story, Tag, Chapter, Reaction, Feedback, Page, Subscriber, Notification, Contact, Poem
+from benie_app.models import Story, Tag, Chapter, Reaction, Feedback, Reply, Page, Subscriber, Notification, Contact, Poem
 
 
 class StorySerializer(serializers.ModelSerializer):
@@ -51,4 +51,9 @@ class ContactSerializer(serializers.ModelSerializer):
 class PoemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Poem
+        fields = ('__all__')
+
+class ReplySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Reply
         fields = ('__all__')

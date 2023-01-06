@@ -15,8 +15,8 @@ import sendgrid
 from sendgrid.helpers.mail import * 
 from decouple import config 
 
-from benie_app.serializers import StorySerializer, TagSerializer, ReactionSerializer, FeedbackSerializer, ChapterSerializer, PageSerializer, SubscriberSerializer, NotificationSerializer, ContactSerializer, PoemSerializer
-from benie_app.models import Story, Tag, Reaction, Feedback, Chapter, Page, Subscriber, Notification, Contact, Poem
+from benie_app.serializers import StorySerializer, TagSerializer, ReactionSerializer, FeedbackSerializer, ReplySerializer, ChapterSerializer, PageSerializer, SubscriberSerializer, NotificationSerializer, ContactSerializer, PoemSerializer
+from benie_app.models import Story, Tag, Reaction, Feedback, Chapter, Page, Subscriber, Notification, Contact, Poem, Reply
 
 # Create your views here.
 def landing(request):
@@ -59,6 +59,19 @@ class AllFeedbacks(APIView):
 
     def post(self, request):
         serializers = FeedbackSerializer(data=request.data)
+        if serializers.is_valid():
+            serializers.save()
+            return Response(serializers.data,status=status.HTTP_201_CREATED)
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class AllReplies(APIView):
+    def get(self,request):
+        replies = Reply.objects.all().order_by('-date')
+        serializers = ReplySerializer(replies,many=True)
+        return Response(serializers.data)
+
+    def post(self, request):
+        serializers = ReplySerializer(data=request.data)
         if serializers.is_valid():
             serializers.save()
             return Response(serializers.data,status=status.HTTP_201_CREATED)
@@ -131,7 +144,7 @@ class PoemDetails(APIView):
         serializers = PoemSerializer(poem,many=False)
         return Response(serializers.data)
 
-class Reactions(APIView):
+class ChapterReactions(APIView):
     def get(self, request, id):
         likes = Reaction.objects.all().filter(chapter=id)
         serializers = ReactionSerializer(likes,many=True)
@@ -335,14 +348,34 @@ class StoryFeedbacks(APIView):
 
 class PoemReactions(APIView):
     def get(self, request, id):
-        reactions = Reaction.objects.all().filter(story=id).filter(like='like')
+        reactions = Reaction.objects.all().filter(poem=id).filter(like='like')
         serializers = ReactionSerializer(reactions,many=True)
         return Response(serializers.data)
 
 class PoemFeedbacks(APIView):
     def get(self, request, id):
-        feedbacks = Feedback.objects.all().filter(story=id).order_by('-date')
+        feedbacks = Feedback.objects.all().filter(poem=id).order_by('-date')
         serializers = FeedbackSerializer(feedbacks,many=True)
+        return Response(serializers.data)
+
+class PoemFeedbackReplies(APIView):
+    def get(self, request, id):
+        replies = Reply.objects.all().filter(comment=id).order_by('-date')
+        comment = Feedback.objects.all().filter(pk=id).last()
+        comment.replies = replies.count() 
+        comment.save()
+        comment.refresh_from_db
+        serializers = ReplySerializer(replies,many=True)
+        return Response(serializers.data)
+
+class PoemFeedbackLikes(APIView):
+    def get(self, request, id):
+        likes = Reaction.objects.all().filter(comment=id).order_by('-date')
+        comment = Feedback.objects.all().filter(pk=id).last()
+        comment.likes = likes.count() 
+        comment.save()
+        comment.refresh_from_db
+        serializers = ReplySerializer(likes,many=True)
         return Response(serializers.data)
 
 class ChapterPages(APIView):

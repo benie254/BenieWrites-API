@@ -31,19 +31,44 @@ class AllStories(APIView):
     def get(self,request):
         stories = Story.objects.all().order_by('-first_published')
         serializers = StorySerializer(stories,many=True)
+        story = Story.objects.filter(pin='pinned').last()
+        if story:
+            story_id = story.id
+            chapters = Chapter.objects.filter(story=story_id)
+            reactions = Reaction.objects.filter(story=story_id)
+            feedbacks = Feedback.objects.filter(story=story_id)
+            story.words = chapters.aggregate(TOTAL=Sum('words'))['TOTAL']
+            story.save()
+            story.refresh_from_db()
+            if chapters:
+                story.chaps = chapters.count()
+                story.save()
+                story.refresh_from_db()
+            if reactions:
+                story.likes = reactions.count()
+                story.save()
+                story.refresh_from_db()
+            if feedbacks:
+                story.comments = feedbacks.count()
+                story.save()
+                story.refresh_from_db()
         return Response(serializers.data)
 
 class OngoingStories(APIView):
     def get(self,request):
         stories = Story.objects.all().filter(status='ongoing').order_by('-first_published')
-        serializers = StorySerializer(stories,many=True)
-        return Response(serializers.data)
+        if stories:
+            serializers = StorySerializer(stories,many=True)
+            return Response(serializers.data)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 class CompletedStories(APIView):
     def get(self,request):
         stories = Story.objects.all().filter(status='completed').order_by('-first_published')
-        serializers = StorySerializer(stories,many=True)
-        return Response(serializers.data)
+        if stories:
+            serializers = StorySerializer(stories,many=True)
+            return Response(serializers.data)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 class AllTags(APIView):
     def get(self,request):
@@ -120,10 +145,45 @@ class RelatedPoems(APIView):
         serializers = PoemSerializer(poems,many=True)
         return Response(serializers.data)
 
+class RelatedStories(APIView):
+    def get(self,request, id):
+        by_categ = Story.objects.all().filter(category=id).order_by('title')
+        by_genre = Story.objects.all().filter(genre=id).order_by('title')
+        by_status = Story.objects.all().filter(status=id).order_by('title')
+        if by_categ:
+            serializers = StorySerializer(by_categ,many=True)
+            return Response(serializers.data)
+        if by_genre:
+            serializers = StorySerializer(by_genre,many=True)
+            return Response(serializers.data)
+        if by_status:
+            serializers = StorySerializer(by_status,many=True)
+            return Response(serializers.data)
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
 class StoryDetails(APIView):
     def get(self,request, id):
         story = Story.objects.all().filter(pk=id).last()
         serializers = StorySerializer(story,many=False)
+        chapters = Chapter.objects.all().filter(story=id).order_by('pk')
+        reactions = Reaction.objects.all().filter(story=id).order_by('pk')
+        feedbacks = Feedback.objects.all().filter(story=id).order_by('pk')
+        if story:
+            story.words = chapters.aggregate(TOTAL=Sum('words'))['TOTAL']
+            story.save()
+            story.refresh_from_db()
+        if chapters:
+            story.chaps = chapters.count()
+            story.save()
+            story.refresh_from_db()
+        if reactions:
+            story.likes = reactions.count()
+            story.save()
+            story.refresh_from_db()
+        if feedbacks:
+            story.comments = feedbacks.count()
+            story.save()
+            story.refresh_from_db()
         return Response(serializers.data)
 
 class PageDetails(APIView):
@@ -306,8 +366,19 @@ class ReactionDetails(APIView):
 # @permission_classes([IsAdminUser,])
 class FeedbackDetails(APIView):
     def get(self,request, id):
-        feedback = Feedback.objects.all().filter(pk=id).last()
-        serializers = FeedbackSerializer(feedback,many=False)
+        comment = Feedback.objects.all().filter(pk=id).last()
+        likes = Reaction.objects.all().filter(comment=id).order_by('-date')
+        replies = Reply.objects.all().filter(comment=id).order_by('-date')
+        if replies:
+            comment.replies = replies.count() 
+            comment.save()
+            comment.refresh_from_db
+        if likes:
+            comment.likes = likes.count() 
+            comment.save()
+            comment.refresh_from_db
+        print("replies",comment.replies)
+        serializers = FeedbackSerializer(comment,many=False)
         return Response(serializers.data)
 
     def put(self, request, id, format=None):
@@ -331,18 +402,33 @@ class StoryChapters(APIView):
             story.words = chapters.aggregate(TOTAL=Sum('words'))['TOTAL']
             story.save()
             story.refresh_from_db()
+        if chapters:
+            story.chaps = chapters.count()
+            story.save()
+            story.refresh_from_db()
         serializers = ChapterSerializer(chapters,many=True)
         return Response(serializers.data)
 
 class StoryReactions(APIView):
     def get(self, request, id):
         reactions = Reaction.objects.all().filter(story=id).filter(like='like')
+        story = Story.objects.all().filter(pk=id).last()
+        if reactions:
+            story.likes = reactions.count()
+            story.save()
+            story.refresh_from_db()
         serializers = ReactionSerializer(reactions,many=True)
         return Response(serializers.data)
 
 class StoryFeedbacks(APIView):
     def get(self, request, id):
         feedbacks = Feedback.objects.all().filter(story=id).order_by('-date')
+        story = Story.objects.all().filter(pk=id).last()
+        if feedbacks:
+            story.comments = feedbacks.count()
+            story.save()
+            story.refresh_from_db()
+        
         serializers = FeedbackSerializer(feedbacks,many=True)
         return Response(serializers.data)
 
@@ -358,7 +444,7 @@ class PoemFeedbacks(APIView):
         serializers = FeedbackSerializer(feedbacks,many=True)
         return Response(serializers.data)
 
-class PoemFeedbackReplies(APIView):
+class FeedbackReplies(APIView):
     def get(self, request, id):
         replies = Reply.objects.all().filter(comment=id).order_by('-date')
         comment = Feedback.objects.all().filter(pk=id).last()
@@ -368,15 +454,17 @@ class PoemFeedbackReplies(APIView):
         serializers = ReplySerializer(replies,many=True)
         return Response(serializers.data)
 
-class PoemFeedbackLikes(APIView):
+class FeedbackLikes(APIView):
     def get(self, request, id):
         likes = Reaction.objects.all().filter(comment=id).order_by('-date')
         comment = Feedback.objects.all().filter(pk=id).last()
-        comment.likes = likes.count() 
-        comment.save()
-        comment.refresh_from_db
-        serializers = ReplySerializer(likes,many=True)
-        return Response(serializers.data)
+        if comment:
+            comment.likes = likes.count() 
+            comment.save()
+            comment.refresh_from_db
+            serializers = ReplySerializer(likes,many=True)
+            return Response(serializers.data)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 class ChapterPages(APIView):
     def get(self,request, id):

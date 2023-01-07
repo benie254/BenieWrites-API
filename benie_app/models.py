@@ -17,15 +17,22 @@ class Story(models.Model):
     author_pic = models.URLField(max_length=1000,default='')
     title = models.CharField(max_length=120,default='')
     description = models.TextField(max_length=5000,default='')
-    CATEGORIES = (('mystery','mystery',),('thriller','thriller'),('drama','drama'),('mystery/thriller','mystery/thriller'),('action','action'),('romance','romance'),('teen-fiction','teen-fiction'))
+    CATEGORIES = (('short-story','short-story',),('novel','novel'),('novelette','novelette'),('play','play'),('flash-fiction','flash-fiction'))
     category = models.CharField(max_length=60,choices=CATEGORIES,default='')
+    GENRES = (('mystery','mystery',),('thriller','thriller'),('drama','drama'),('mystery/thriller','mystery/thriller'),('action','action'),('romance','romance'),('teen-fiction','teen-fiction'))
+    genre = models.CharField(max_length=60,choices=GENRES,default='')
     tagged = models.ManyToManyField(Tag,null=True,blank=True)
     uploaded = models.DateTimeField(default=timezone.now)
     first_published = models.DateField(default=timezone.now)
     STATUSES = (('completed','completed'),('ongoing','ongoing'))
+    PINS = (('pinned','pinned'),('unpinned','unpinned'))
+    pin = models.CharField(choices=PINS,max_length=60,default='',null=True,blank=True)
     status = models.CharField(max_length=60,choices=STATUSES,default='')
     last_updated = models.DateTimeField(auto_now_add=True,null=True,blank=True)
     words = models.PositiveIntegerField(null=True,blank=True)
+    likes = models.IntegerField(null=True,blank=True)
+    comments = models.IntegerField(null=True,blank=True)
+    chaps = models.IntegerField(null=True,blank=True)
 
     def __str__(self):
         return self.title
@@ -87,8 +94,8 @@ class Poem(models.Model):
         return poems
 
 class Feedback(models.Model):
-    comment = models.TextField(max_length=2500,null=True,blank=True)
-    commented_by = models.CharField(max_length=120,null=True,blank=True)
+    comment = models.TextField(max_length=2500,null=True,blank=True,default='Beautiful piece!')
+    commented_by = models.CharField(max_length=120,null=True,blank=True,default='Anonymous')
     story = models.ForeignKey(Story,on_delete=models.CASCADE,default='',null=True,blank=True)
     chapter = models.ForeignKey(Chapter,on_delete=models.CASCADE,default='',null=True,blank=True)
     poem = models.ForeignKey(Poem,on_delete=models.CASCADE,default='',null=True,blank=True)
@@ -96,8 +103,6 @@ class Feedback(models.Model):
     date = models.DateTimeField(default=timezone.now)
     replies = models.IntegerField(null=True,blank=True)
 
-    def __str__(self):
-        return self.comment
 
 class Reaction(models.Model):
     REACTIONS = (('like','like'),('dislike','dislike'))
@@ -114,8 +119,8 @@ class Reaction(models.Model):
 
 
 class Reply(models.Model):
-    msg = models.TextField(max_length=2500,null=True,blank=True)
-    replied_by = models.CharField(max_length=120,null=True,blank=True)
+    msg = models.TextField(max_length=2500,null=True,blank=True,default='')
+    replied_by = models.CharField(max_length=120,null=True,blank=True,default='')
     comment = models.ForeignKey(Feedback,on_delete=models.CASCADE,default='',null=True,blank=True)
     date = models.DateTimeField(default=timezone.now)
 

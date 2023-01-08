@@ -39,7 +39,6 @@ class AllStories(APIView):
                     s.chap1_id = c.pk
                     s.save()
                     s.refresh_from_db()
-                break
         if story:
             story_id = story.id
             chapters = Chapter.objects.filter(story=story_id)
@@ -72,7 +71,6 @@ class OngoingStories(APIView):
                     s.chap1_id = c.pk
                     s.save()
                     s.refresh_from_db()
-                break
             serializers = StorySerializer(stories,many=True)
             return Response(serializers.data)
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -87,7 +85,6 @@ class CompletedStories(APIView):
                     s.chap1_id = c.pk
                     s.save()
                     s.refresh_from_db()
-                break
             serializers = StorySerializer(stories,many=True)
             return Response(serializers.data)
         return Response(status=status.HTTP_404_NOT_FOUND)

@@ -34,10 +34,11 @@ class AllStories(APIView):
         story = Story.objects.filter(pin='pinned').last()
         if stories:
             for s in stories:
-                chaps = Chapter.objects.filter(story=s.pk).first()
-                s.chap1_id = chaps.pk
-                s.save()
-                s.refresh_from_db()
+                chaps = Chapter.objects.filter(story=s.pk)
+                for c in chaps:
+                    s.chap1_id = c.pk
+                    s.save()
+                    s.refresh_from_db()
                 break
         if story:
             story_id = story.id

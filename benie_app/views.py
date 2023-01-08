@@ -37,6 +37,7 @@ class AllStories(APIView):
             print(s.chap1_id)
             s.save()
             s.refresh_from_db()
+            break
         if story:
             story_id = story.id
             chapters = Chapter.objects.filter(story=story_id)

@@ -13,26 +13,27 @@ class Tag(models.Model):
 
 class Story(models.Model):
     author = models.CharField(max_length=120,default='')
-    cover = models.URLField(max_length=1000,default='')
     author_pic = models.URLField(max_length=1000,default='')
+    cover = models.URLField(max_length=1000,default='')
     title = models.CharField(max_length=120,default='')
     description = models.TextField(max_length=5000,default='')
     CATEGORIES = (('short-story','short-story',),('novel','novel'),('novelette','novelette'),('play','play'),('flash-fiction','flash-fiction'))
     category = models.CharField(max_length=60,choices=CATEGORIES,default='')
-    GENRES = (('mystery','mystery',),('thriller','thriller'),('drama','drama'),('mystery/thriller','mystery/thriller'),('action','action'),('romance','romance'),('teen-fiction','teen-fiction'))
+    GENRES = (('mystery','mystery',),('drama','drama',),('thriller','thriller'),('drama','drama'),('mystery/thriller','mystery/thriller'),('action','action'),('romance','romance'),('teen-fiction','teen-fiction'))
     genre = models.CharField(max_length=60,choices=GENRES,default='')
     tagged = models.ManyToManyField(Tag,null=True,blank=True)
     uploaded = models.DateTimeField(default=timezone.now)
     first_published = models.DateField(default=timezone.now)
+    last_updated = models.DateTimeField(auto_now_add=True,null=True,blank=True)
     STATUSES = (('completed','completed'),('ongoing','ongoing'))
+    status = models.CharField(max_length=60,choices=STATUSES,default='')
     PINS = (('pinned','pinned'),('unpinned','unpinned'))
     pin = models.CharField(choices=PINS,max_length=60,default='',null=True,blank=True)
-    status = models.CharField(max_length=60,choices=STATUSES,default='')
-    last_updated = models.DateTimeField(auto_now_add=True,null=True,blank=True)
     words = models.PositiveIntegerField(null=True,blank=True)
     likes = models.IntegerField(null=True,blank=True)
     comments = models.IntegerField(null=True,blank=True)
     chaps = models.IntegerField(null=True,blank=True)
+    chap1_id = models.IntegerField(null=True,blank=True)
 
     def __str__(self):
         return self.title

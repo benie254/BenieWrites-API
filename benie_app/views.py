@@ -32,6 +32,11 @@ class AllStories(APIView):
         stories = Story.objects.all().order_by('-first_published')
         serializers = StorySerializer(stories,many=True)
         story = Story.objects.filter(pin='pinned').last()
+        for s in stories:
+            s.chap1_id = Chapter.objects.filter(story=s.pk)
+            print(s.chap1_id)
+            s.save()
+            s.refresh_from_db()
         if story:
             story_id = story.id
             chapters = Chapter.objects.filter(story=story_id)

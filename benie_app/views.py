@@ -81,6 +81,13 @@ class CompletedStories(APIView):
     def get(self,request):
         stories = Story.objects.all().filter(status='completed').order_by('-first_published')
         if stories:
+            for s in stories:
+                chaps = Chapter.objects.filter(story=s.pk)
+                for c in chaps:
+                    s.chap1_id = c.pk
+                    s.save()
+                    s.refresh_from_db()
+                break
             serializers = StorySerializer(stories,many=True)
             return Response(serializers.data)
         return Response(status=status.HTTP_404_NOT_FOUND)

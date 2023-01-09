@@ -547,7 +547,7 @@ class Unsubscribe(APIView):
         subscriber_email = request.data['email']
         subscriber = Subscriber.objects.filter(email=subscriber_email).first()
         if subscriber:
-            Unsubscribe.delete(subscriber_email)
+            Unsubscribe.delete(request,user_email=subscriber_email)
             return Response(status=status.HTTP_200_OK)
         return Response(status=status.HTTP_400_BAD_REQUEST)
     def delete(self,request,user_email, format=None):

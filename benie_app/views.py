@@ -541,16 +541,17 @@ class AllSubscribers(APIView):
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class Unsubscribe(APIView):
-    def delete(self,request, format=None):
+    def post(self, request, format=None):
         serializers = SubscriberSerializer(data=request.data)
         if serializers.is_valid():
-            user_email = serializers.validated_data['email']
-            subscriber = Subscriber.objects.filter(email=user_email).first()
+            subscriber_email = serializers.validated_data['email']
+            subscriber = Subscriber.objects.filter(email=subscriber_email).first()
             if subscriber is None:
                 raise AuthenticationFailed('Subscriber not found!')
+            Unsubscribe.delete(user_email=subscriber_email)
+    def delete(self,request,user_email, format=None):
+            subscriber = Subscriber.objects.filter(email=user_email)
             subscriber.delete()
-            serializers.save()
-            subscriber.refresh_from_db()
             sg = sendgrid.SendGridAPIClient(api_key=config('SENDGRID_API_KEY'))
             msg = render_to_string('email/unsubscribed.html', {
                 'email': user_email,
@@ -592,8 +593,7 @@ class Unsubscribe(APIView):
                 'success' : 'True',
                 'status code' : status_code,
                 }
-            return Response(serializers.data, status=status.HTTP_201_CREATED)
-        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)  
+            return Response(status=status.HTTP_200_OK)
 
 class Notifications(APIView):
     def get(self,request):

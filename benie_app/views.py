@@ -544,11 +544,9 @@ class AllSubscribers(APIView):
 class Unsubscribe(APIView):
     def post(self, request, format=None):
         serializers = SubscriberSerializer(data=request.data)
-        if serializers.is_valid():
-            subscriber_email = serializers.validated_data['email']
-            subscriber = Subscriber.objects.filter(email=subscriber_email).first()
-            if subscriber is None:
-                raise ValidationError('Subscriber not found!')
+        subscriber_email = serializers.validated_data['email']
+        subscriber = Subscriber.objects.filter(email=subscriber_email).first()
+        if subscriber:
             Unsubscribe.delete(subscriber_email)
             return Response(status=status.HTTP_200_OK)
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)

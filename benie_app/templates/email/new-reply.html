@@ -26,8 +26,12 @@
             {{stp}} | {{pmp}}
             <a href="https://benie.web.app/stories/{{story.category}}/{{story.title}}/preview/{{story.id}}"><li>{{story.title}}</li></a>
             <a href="https://benie.web.app/poems/{{poem.category}}/{{poem.title}}/read/{{poem.id}}"><li>{{poem.title}}</li></a>
-            <h3 style="color:orange">Comment</h3>
-            <p>{{content}}</p>
+            <h3 style="color:orange">Reply</h3>
+            <p>{{reply}}</p>
+            <small style="color: blueviolet">replying to:
+            <br>
+        {{comment}}
+        </small>
         </ul>
     </div>
     <div style="padding:1.5%;margin-top:1.5%;background-color:rgb(51, 50, 50);">

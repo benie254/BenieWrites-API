@@ -148,7 +148,7 @@ class AllReplies(APIView):
             cmnt = serializers.validated_data['comment']
             replied_by = serializers.validated_data['replied_by']
             content = serializers.validated_data['msg']
-            comment = Feedback.objects.filter(msg=cmnt).last()
+            reply = Reply.objects.filter(msg=cmnt).last()
             st = serializers.validated_data['story']
             pm = serializers.validated_data['poem']
             if st:
@@ -168,16 +168,17 @@ class AllReplies(APIView):
             msg = render_to_string('email/new-reply.html', {
                 'replied_by':replied_by,
                 'content': content,
-                'comment': comment,
+                'reply': reply,
                 'stp': stp,
                 'pmp': pmp,
                 'poem': poem,
                 'story':story,
+                'comment': cmnt,
             })
             message = Mail(
                 from_email = Email("davinci.monalissa@gmail.com"),
                 to_emails = 'beniewrites@gmail.com',
-                subject = "New Comment",
+                subject = "New Reply",
                 html_content= msg
             )
             try:

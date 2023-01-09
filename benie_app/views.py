@@ -545,7 +545,6 @@ class Unsubscribe(APIView):
     def delete(self,request, user_email, format=None):
             subscriber = Subscriber.objects.filter(email=user_email).first()
             if subscriber:
-                subscriber.delete()
                 sg = sendgrid.SendGridAPIClient(api_key=config('SENDGRID_API_KEY'))
                 msg = render_to_string('email/unsubscribed.html', {
                     'email': user_email,
@@ -585,6 +584,7 @@ class Unsubscribe(APIView):
                 response = {
                     'success' : 'True',
                     }
+                subscriber.delete()
                 return Response(status=status.HTTP_200_OK)
             return Response(status=status.HTTP_400_BAD_REQUEST)
 

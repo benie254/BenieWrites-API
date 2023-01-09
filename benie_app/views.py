@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import permission_classes 
 from rest_framework.permissions import IsAdminUser, AllowAny
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.exceptions import ValidationError
 
 import sendgrid
 from sendgrid.helpers.mail import * 
@@ -548,7 +548,7 @@ class Unsubscribe(APIView):
             subscriber_email = serializers.validated_data['email']
             subscriber = Subscriber.objects.filter(email=subscriber_email).first()
             if subscriber is None:
-                raise AuthenticationFailed('Subscriber not found!')
+                raise ValidationError('Subscriber not found!')
             Unsubscribe.delete(subscriber_email)
     def delete(self,request,user_email, format=None):
             subscriber = Subscriber.objects.filter(email=user_email)

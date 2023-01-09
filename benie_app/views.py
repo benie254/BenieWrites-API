@@ -537,6 +537,8 @@ class AllSubscribers(APIView):
             return Response(serializers.data, status=status.HTTP_201_CREATED)
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
+        
+
 class Notifications(APIView):
     def get(self,request):
         notifications = Notification.objects.all().order_by('-date')

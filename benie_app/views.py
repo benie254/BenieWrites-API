@@ -543,13 +543,13 @@ class AllSubscribers(APIView):
 @permission_classes([AllowAny,])
 class Unsubscribe(APIView):
     def post(self, request, format=None):
-        serializers = SubscriberSerializer(data=request.data)
-        subscriber_email = serializers.validated_data['email']
+        serializer_class = SubscriberSerializer
+        subscriber_email = request.data['email']
         subscriber = Subscriber.objects.filter(email=subscriber_email).first()
         if subscriber:
             Unsubscribe.delete(subscriber_email)
             return Response(status=status.HTTP_200_OK)
-        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
     def delete(self,request,user_email, format=None):
             subscriber = Subscriber.objects.filter(email=user_email)
             subscriber.delete(user_email)

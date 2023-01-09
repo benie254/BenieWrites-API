@@ -550,6 +550,8 @@ class Unsubscribe(APIView):
             if subscriber is None:
                 raise ValidationError('Subscriber not found!')
             Unsubscribe.delete(subscriber_email)
+            return Response(status=status.HTTP_200_OK)
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
     def delete(self,request,user_email, format=None):
             subscriber = Subscriber.objects.filter(email=user_email)
             subscriber.delete(user_email)

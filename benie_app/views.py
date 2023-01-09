@@ -542,9 +542,7 @@ class AllSubscribers(APIView):
 
 @permission_classes([AllowAny,])
 class Unsubscribe(APIView):
-    def delete(self,request, format=None):
-        user_email = request.data['email']
-        DelSubSerializer(data=user_email)
+    def delete(self,request, user_email, format=None):
         try:
             subscriber = Subscriber.objects.filter(email=user_email).first()
         except (TypeError, ValueError, OverflowError, Subscriber.DoesNotExist):

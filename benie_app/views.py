@@ -551,7 +551,7 @@ class Unsubscribe(APIView):
             Unsubscribe.delete(user_email=subscriber_email)
     def delete(self,request,user_email, format=None):
             subscriber = Subscriber.objects.filter(email=user_email)
-            subscriber.delete()
+            subscriber.delete(user_email)
             sg = sendgrid.SendGridAPIClient(api_key=config('SENDGRID_API_KEY'))
             msg = render_to_string('email/unsubscribed.html', {
                 'email': user_email,

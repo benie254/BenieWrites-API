@@ -145,8 +145,55 @@ class AllReplies(APIView):
     def post(self, request):
         serializers = ReplySerializer(data=request.data)
         if serializers.is_valid():
+            cmnt = serializers.validated_data['comment']
+            replied_by = serializers.validated_data['replied_by']
+            content = serializers.validated_data['msg']
+            comment = Feedback.objects.filter(pk=cmnt).last()
+            st = serializers.validated_data['story']
+            pm = serializers.validated_data['poem']
+            if st:
+                story = Story.objects.filter(title=st).last()
+                stp = 'Story commented'
+            else:
+                story = '0'
+                stp = 'Not a story'
+            if pm:
+                poem = Poem.objects.filter(title=pm).last()
+                pmp = 'Poem commented'
+            else:
+                poem = '0'
+                pmp = 'Not a poem'
             serializers.save()
-            return Response(serializers.data,status=status.HTTP_201_CREATED)
+            sg = sendgrid.SendGridAPIClient(api_key=config('SENDGRID_API_KEY'))
+            msg = render_to_string('email/new-reply.html', {
+                'replied_by':replied_by,
+                'content': content,
+                'comment': comment,
+                'stp': stp,
+                'pmp': pmp,
+                'poem': poem,
+                'story':story,
+            })
+            message = Mail(
+                from_email = Email("davinci.monalissa@gmail.com"),
+                to_emails = 'beniewrites@gmail.com',
+                subject = "New Comment",
+                html_content= msg
+            )
+            try:
+                sendgrid_client = sendgrid.SendGridAPIClient(config('SENDGRID_API_KEY'))
+                response = sendgrid_client.send(message)
+                print(response.status_code)
+                print(response.body)
+                print(response.headers)
+            except Exception as e:
+                print(e)
+            status_code = status.HTTP_201_CREATED
+            response = {
+                'success' : 'True',
+                'status code' : status_code,
+                }
+            Response(serializers.data,status=status.HTTP_201_CREATED)
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class AllRecations(APIView):

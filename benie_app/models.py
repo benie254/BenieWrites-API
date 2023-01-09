@@ -124,9 +124,10 @@ class Reply(models.Model):
     replied_by = models.CharField(max_length=120,null=True,blank=True,default='')
     comment = models.ForeignKey(Feedback,on_delete=models.CASCADE,default='',null=True,blank=True)
     date = models.DateTimeField(default=timezone.now)
+    story = models.ForeignKey(Story,on_delete=models.CASCADE,default='',null=True,blank=True)
 
-    def __str__(self):
-        return self.comment
+    def __int__(self):
+        return self.pk
 
 class Notification(models.Model):
     subject = models.CharField(max_length=60,default='',null=True,blank=True)

@@ -16,7 +16,7 @@ import sendgrid
 from sendgrid.helpers.mail import * 
 from decouple import config 
 
-from benie_app.serializers import StorySerializer, TagSerializer, ReactionSerializer, FeedbackSerializer, ReplySerializer, ChapterSerializer, PageSerializer, SubscriberSerializer, NotificationSerializer, ContactSerializer, PoemSerializer
+from benie_app.serializers import StorySerializer, TagSerializer, ReactionSerializer, FeedbackSerializer, DelSubSerializer, ReplySerializer, ChapterSerializer, PageSerializer, SubscriberSerializer, NotificationSerializer, ContactSerializer, PoemSerializer
 from benie_app.models import Story, Tag, Reaction, Feedback, Chapter, Page, Subscriber, Notification, Contact, Poem, Reply
 
 
@@ -544,6 +544,7 @@ class AllSubscribers(APIView):
 class Unsubscribe(APIView):
     def delete(self,request, format=None):
         user_email = request.data['email']
+        DelSubSerializer(data=user_email)
         try:
             subscriber = Subscriber.objects.filter(email=user_email).first()
         except (TypeError, ValueError, OverflowError, Subscriber.DoesNotExist):

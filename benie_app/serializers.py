@@ -57,3 +57,8 @@ class ReplySerializer(serializers.ModelSerializer):
     class Meta:
         model = Reply
         fields = ('__all__')
+
+class DelSubSerializer(serializers.ModelSerializer):
+    class Meta:
+        model: Subscriber
+        fields = ('email',)

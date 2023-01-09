@@ -589,7 +589,7 @@ class Unsubscribe(APIView):
                     }
             subscriber.delete()
             return Response(status=status.HTTP_200_OK) 
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_421_MISDIRECTED_REQUEST)
         
             
 

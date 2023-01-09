@@ -30,7 +30,9 @@
             <p>{{reply}}</p>
             <small style="color: blueviolet">replying to:
             <br>
-        {{comment}}
+        {{comment.comment}} 
+        <br>
+        <span style="color:orange">commented by</span> {{comment.commented_by}} on {{comment.date | date}}
         </small>
         </ul>
     </div>

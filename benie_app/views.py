@@ -148,7 +148,7 @@ class AllReplies(APIView):
             cmnt = serializers.validated_data['comment']
             replied_by = serializers.validated_data['replied_by']
             content = serializers.validated_data['msg']
-            reply = Reply.objects.filter(msg=cmnt).last()
+            reply = Reply.objects.filter(comment=cmnt).last()
             st = serializers.validated_data['story']
             pm = serializers.validated_data['poem']
             if st:

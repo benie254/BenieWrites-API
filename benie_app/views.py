@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import permission_classes 
 from rest_framework.permissions import IsAdminUser
+from rest_framework.exceptions import AuthenticationFailed
 
 import sendgrid
 from sendgrid.helpers.mail import * 
@@ -17,6 +18,8 @@ from decouple import config
 
 from benie_app.serializers import StorySerializer, TagSerializer, ReactionSerializer, FeedbackSerializer, ReplySerializer, ChapterSerializer, PageSerializer, SubscriberSerializer, NotificationSerializer, ContactSerializer, PoemSerializer
 from benie_app.models import Story, Tag, Reaction, Feedback, Chapter, Page, Subscriber, Notification, Contact, Poem, Reply
+
+
 
 # Create your views here.
 def landing(request):
@@ -537,7 +540,60 @@ class AllSubscribers(APIView):
             return Response(serializers.data, status=status.HTTP_201_CREATED)
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        
+class Unsubscribe(APIView):
+    def delete(self,request, format=None):
+        serializers = SubscriberSerializer(data=request.data)
+        if serializers.is_valid():
+            user_email = serializers.validated_data['email']
+            subscriber = Subscriber.objects.filter(email=user_email).first()
+            if subscriber is None:
+                raise AuthenticationFailed('Subscriber not found!')
+            subscriber.delete()
+            serializers.save()
+            subscriber.refresh_from_db()
+            sg = sendgrid.SendGridAPIClient(api_key=config('SENDGRID_API_KEY'))
+            msg = render_to_string('email/unsubscribed.html', {
+                'email': user_email,
+            })
+            message = Mail(
+                from_email = Email("davinci.monalissa@gmail.com"),
+                to_emails = 'beniewrites@gmail.com',
+                subject = "Subscriber Optout",
+                html_content= msg
+            )
+            try:
+                sendgrid_client = sendgrid.SendGridAPIClient(config('SENDGRID_API_KEY'))
+                response = sendgrid_client.send(message)
+                print(response.status_code)
+                print(response.body)
+                print(response.headers)
+            except Exception as e:
+                print(e)
+
+            msg2 = render_to_string('email/goodbye-subscriber.html', {
+                'email': user_email,
+            })
+            message2 = Mail(
+                from_email = Email("davinci.monalissa@gmail.com"),
+                to_emails = user_email,
+                subject = "Unsubscribed",
+                html_content= msg2
+            )
+            try:
+                sendgrid_client = sendgrid.SendGridAPIClient(config('SENDGRID_API_KEY'))
+                response = sendgrid_client.send(message2)
+                print(response.status_code)
+                print(response.body)
+                print(response.headers)
+            except Exception as e:
+                print(e)
+            status_code = status.HTTP_201_CREATED
+            response = {
+                'success' : 'True',
+                'status code' : status_code,
+                }
+            return Response(serializers.data, status=status.HTTP_201_CREATED)
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)  
 
 class Notifications(APIView):
     def get(self,request):

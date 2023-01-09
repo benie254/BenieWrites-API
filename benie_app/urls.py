@@ -46,4 +46,5 @@ urlpatterns = [
     url(r'^feedback/replies/(\d+)$',views.FeedbackReplies.as_view(),name='poem-feedback-replies'),
     url(r'^feedback/likes/(\d+)$',views.FeedbackLikes.as_view(),name='poem-feedback-likes'),
     url(r'^poems/past/(\d{4}-\d{2}-\d{2})$',views.PastPoems.as_view(),name='past-poems'),
+    url(r'^newsletter/unsubscribe/$',views.Unsubscribe.as_view(),name='unsubscribe'),
 ]

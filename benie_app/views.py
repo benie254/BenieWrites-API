@@ -549,7 +549,7 @@ class Unsubscribe(APIView):
             subscriber = Subscriber.objects.filter(email=subscriber_email).first()
             if subscriber is None:
                 raise AuthenticationFailed('Subscriber not found!')
-            Unsubscribe.delete(user_email=subscriber_email)
+            Unsubscribe.delete(subscriber_email)
     def delete(self,request,user_email, format=None):
             subscriber = Subscriber.objects.filter(email=user_email)
             subscriber.delete(user_email)

@@ -104,7 +104,6 @@ class AllFeedbacks(APIView):
                 poem = '0'
                 pmp = 'Not a poem'
             serializers.save()
-            Response(serializers.data,status=status.HTTP_201_CREATED)
             sg = sendgrid.SendGridAPIClient(api_key=config('SENDGRID_API_KEY'))
             msg = render_to_string('email/new-comment.html', {
                 'story':story,
@@ -134,6 +133,7 @@ class AllFeedbacks(APIView):
                 'success' : 'True',
                 'status code' : status_code,
                 }
+            Response(serializers.data,status=status.HTTP_201_CREATED)
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class AllReplies(APIView):

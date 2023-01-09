@@ -32,13 +32,6 @@ class AllStories(APIView):
         stories = Story.objects.all().order_by('-first_published')
         serializers = StorySerializer(stories,many=True)
         story = Story.objects.filter(pin='pinned').last()
-        if stories:
-            for s in stories:
-                chaps = Chapter.objects.filter(story=s.pk)
-                for c in chaps:
-                    s.chap1_id = c.pk
-                    s.save()
-                    s.refresh_from_db()
         if story:
             story_id = story.id
             chapters = Chapter.objects.filter(story=story_id)
@@ -65,12 +58,6 @@ class OngoingStories(APIView):
     def get(self,request):
         stories = Story.objects.all().filter(status='ongoing').order_by('-first_published')
         if stories:
-            for s in stories:
-                chaps = Chapter.objects.filter(story=s.pk)
-                for c in chaps:
-                    s.chap1_id = c.pk
-                    s.save()
-                    s.refresh_from_db()
             serializers = StorySerializer(stories,many=True)
             return Response(serializers.data)
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -79,12 +66,6 @@ class CompletedStories(APIView):
     def get(self,request):
         stories = Story.objects.all().filter(status='completed').order_by('-first_published')
         if stories:
-            for s in stories:
-                chaps = Chapter.objects.filter(story=s.pk)
-                for c in chaps:
-                    s.chap1_id = c.pk
-                    s.save()
-                    s.refresh_from_db()
             serializers = StorySerializer(stories,many=True)
             return Response(serializers.data)
         return Response(status=status.HTTP_404_NOT_FOUND)

@@ -19,7 +19,7 @@ class Story(models.Model):
     description = models.TextField(max_length=5000,default='')
     CATEGORIES = (('short-story','short-story',),('novel','novel'),('novelette','novelette'),('play','play'),('flash-fiction','flash-fiction'))
     category = models.CharField(max_length=60,choices=CATEGORIES,default='')
-    GENRES = (('mystery','mystery',),('drama','drama',),('thriller','thriller'),('drama','drama'),('mystery/thriller','mystery/thriller'),('action','action'),('romance','romance'),('teen-fiction','teen-fiction'))
+    GENRES = (('mystery','mystery',),('drama','drama',),('thriller','thriller'),('drama','drama'),('mystery-thriller','mystery-thriller'),('action','action'),('romance','romance'),('teen-fiction','teen-fiction'))
     genre = models.CharField(max_length=60,choices=GENRES,default='')
     tagged = models.ManyToManyField(Tag,null=True,blank=True)
     uploaded = models.DateTimeField(default=timezone.now)

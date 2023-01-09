@@ -540,11 +540,10 @@ class AllSubscribers(APIView):
             return Response(serializers.data, status=status.HTTP_201_CREATED)
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@permission_classes([AllowAny,])
 class Unsubscribe(APIView):
-    def get(self,request,user_email,format=None):
-        subscriber = Subscriber.objects.filter(email=user_email).first()
-        serializers = SubscriberSerializer(subscriber,many=True)
+    def get(self,request,id):
+        subscriber = Subscriber.objects.filter(email=id)
+        serializers = SubscriberSerializer(subscriber,many=False)
         return Response(serializers.data)
 
     def delete(self,request, user_email, format=None):

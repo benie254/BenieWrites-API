@@ -125,6 +125,7 @@ class Reply(models.Model):
     comment = models.ForeignKey(Feedback,on_delete=models.CASCADE,default='',null=True,blank=True)
     date = models.DateTimeField(default=timezone.now)
     story = models.ForeignKey(Story,on_delete=models.CASCADE,default='',null=True,blank=True)
+    poem = models.ForeignKey(Poem,on_delete=models.CASCADE,default='',null=True,blank=True)
 
     def __int__(self):
         return self.pk

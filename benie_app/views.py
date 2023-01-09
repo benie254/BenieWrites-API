@@ -543,55 +543,50 @@ class AllSubscribers(APIView):
 @permission_classes([AllowAny,])
 class Unsubscribe(APIView):
     def delete(self,request, user_email, format=None):
-        try:
             subscriber = Subscriber.objects.filter(email=user_email).first()
-        except (TypeError, ValueError, OverflowError, Subscriber.DoesNotExist):
-            subscriber = None 
-        if subscriber is not None:
-            subscriber.delete()
-            sg = sendgrid.SendGridAPIClient(api_key=config('SENDGRID_API_KEY'))
-            msg = render_to_string('email/unsubscribed.html', {
-                'email': user_email,
-            })
-            message = Mail(
-                from_email = Email("davinci.monalissa@gmail.com"),
-                to_emails = 'beniewrites@gmail.com',
-                subject = "Subscriber Optout",
-                html_content= msg
-            )
-            try:
-                sendgrid_client = sendgrid.SendGridAPIClient(config('SENDGRID_API_KEY'))
-                response = sendgrid_client.send(message)
-                print(response.status_code)
-                print(response.body)
-                print(response.headers)
-            except Exception as e:
-                print(e)
+            if subscriber:
+                subscriber.delete()
+                sg = sendgrid.SendGridAPIClient(api_key=config('SENDGRID_API_KEY'))
+                msg = render_to_string('email/unsubscribed.html', {
+                    'email': user_email,
+                })
+                message = Mail(
+                    from_email = Email("davinci.monalissa@gmail.com"),
+                    to_emails = 'beniewrites@gmail.com',
+                    subject = "Subscriber Optout",
+                    html_content= msg
+                )
+                try:
+                    sendgrid_client = sendgrid.SendGridAPIClient(config('SENDGRID_API_KEY'))
+                    response = sendgrid_client.send(message)
+                    print(response.status_code)
+                    print(response.body)
+                    print(response.headers)
+                except Exception as e:
+                    print(e)
 
-            msg2 = render_to_string('email/goodbye-subscriber.html', {
-                'email': user_email,
-            })
-            message2 = Mail(
-                from_email = Email("davinci.monalissa@gmail.com"),
-                to_emails = user_email,
-                subject = "Unsubscribed",
-                html_content= msg2
-            )
-            try:
-                sendgrid_client = sendgrid.SendGridAPIClient(config('SENDGRID_API_KEY'))
-                response = sendgrid_client.send(message2)
-                print(response.status_code)
-                print(response.body)
-                print(response.headers)
-            except Exception as e:
-                print(e)
-            status_code = status.HTTP_201_CREATED
-            response = {
-                'success' : 'True',
-                'status code' : status_code,
-                }
-            return Response(status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+                msg2 = render_to_string('email/goodbye-subscriber.html', {
+                    'email': user_email,
+                })
+                message2 = Mail(
+                    from_email = Email("davinci.monalissa@gmail.com"),
+                    to_emails = user_email,
+                    subject = "Unsubscribed",
+                    html_content= msg2
+                )
+                try:
+                    sendgrid_client = sendgrid.SendGridAPIClient(config('SENDGRID_API_KEY'))
+                    response = sendgrid_client.send(message2)
+                    print(response.status_code)
+                    print(response.body)
+                    print(response.headers)
+                except Exception as e:
+                    print(e)
+                response = {
+                    'success' : 'True',
+                    }
+                return Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 class Notifications(APIView):
     def get(self,request):

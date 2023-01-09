@@ -1,3 +1,18 @@
+
+<div>
+    <h3><i class="fa-solid fa-book-open-reader"></i> Benie Writes</h3>
+    <h1>Hello, Benie.</h1>
+    <p>You have a new contact on Benie Writes. Check out their message on the admin ASAP.</p>
+    <br>
+    <small>
+        Cheers!
+        <br>
+        The Dev Team,
+        <br>
+        Benie Writes.
+    </small>
+</div>
+
 <div class="container" style="padding:2.5%;">
     <a href="https://benie.web.app/">
         <h1 style="text-align:center;">
@@ -6,10 +21,13 @@
     </a>
     <div style="padding:1.5%;">
         <h1>Hello Benie,</h1>
-        <p>You have a new subscriber on Benie Writes. Here are their details:</p>
+        <p>You have a new comment on Benie Writes. Here are the details:</p>
         <ul>
-            <li><span><strong>email</strong></span> &nbsp;&nbsp; <span style="color:blueviolet">{{email}}</span></li>
-            <li><span><strong>name</strong></span> &nbsp;&nbsp;<span style="color:blueviolet">{{name}}</span></li>
+            {{stp}} or {{pmp}}
+            <a href="https://benie.web.app/stories/{{story.category}}/{{story.title}}/preview/{{story.id}}"><li>{{story.title}}</li></a>
+            <a href="https://benie.web.app/poems/{{poem.category}}/{{poem.title}}/read/{{poem.id}}"><li>{{poem.title}}</li></a>
+            <h3 style="color:orange">Comment</h3>
+            <p>{{comment}}</p>
         </ul>
     </div>
     <div style="padding:1.5%;margin-top:1.5%;background-color:rgb(51, 50, 50);">

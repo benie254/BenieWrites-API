@@ -94,6 +94,8 @@ REST_KNOX = {
   'AUTO_REFRESH': False,
 }
 
+AUTH_USER_MODEL = "benie_app.MyUser"
+
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:4200',

@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import permission_classes 
-from rest_framework.permissions import IsAdminUser, AllowAny
+from rest_framework.permissions import IsAdminUser, AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.exceptions import ValidationError
 
 import sendgrid
@@ -22,14 +22,17 @@ from benie_app.models import Story, Tag, Reaction, Feedback, Chapter, Page, Subs
 
 
 # Create your views here.
+@permission_classes([IsAuthenticatedOrReadOnly,])
 def landing(request):
     return render(request,'landing.html',{})
     
+@permission_classes([IsAuthenticatedOrReadOnly,])
 def home(request):
     stories = Story.objects.all()
     chapters = Chapter.objects.all()
     return render(request,'index.html',{"stories":stories,"chapters":chapters})
 
+@permission_classes([IsAuthenticatedOrReadOnly,])
 class AllStories(APIView):
     def get(self,request):
         stories = Story.objects.all().order_by('-first_published')
@@ -57,6 +60,7 @@ class AllStories(APIView):
                 story.refresh_from_db()
         return Response(serializers.data)
 
+@permission_classes([IsAuthenticatedOrReadOnly,])
 class OngoingStories(APIView):
     def get(self,request):
         stories = Story.objects.all().filter(status='ongoing').order_by('-first_published')
@@ -65,6 +69,7 @@ class OngoingStories(APIView):
             return Response(serializers.data)
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+@permission_classes([IsAuthenticatedOrReadOnly,])
 class CompletedStories(APIView):
     def get(self,request):
         stories = Story.objects.all().filter(status='completed').order_by('-first_published')
@@ -73,12 +78,14 @@ class CompletedStories(APIView):
             return Response(serializers.data)
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+@permission_classes([IsAuthenticatedOrReadOnly,])
 class AllTags(APIView):
     def get(self,request):
         tags = Tag.objects.all()
         serializers = TagSerializer(tags,many=True)
         return Response(serializers.data)
 
+@permission_classes([AllowAny,])
 class AllFeedbacks(APIView):
     def get(self,request):
         feedbacks = Feedback.objects.all().order_by('-date')
@@ -136,6 +143,7 @@ class AllFeedbacks(APIView):
             Response(serializers.data,status=status.HTTP_201_CREATED)
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@permission_classes([AllowAny,])
 class AllReplies(APIView):
     def get(self,request):
         replies = Reply.objects.all().order_by('-date')
@@ -197,6 +205,7 @@ class AllReplies(APIView):
             Response(serializers.data,status=status.HTTP_201_CREATED)
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@permission_classes([AllowAny,])
 class AllRecations(APIView):
     def get(self,request):
         reactions = Reaction.objects.all()
@@ -210,36 +219,42 @@ class AllRecations(APIView):
             return Response(serializers.data,status=status.HTTP_201_CREATED)
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)  
 
+@permission_classes([IsAuthenticatedOrReadOnly,])
 class AllChapters(APIView):
     def get(self,request):
         chapters = Chapter.objects.all()
         serializers = ChapterSerializer(chapters,many=True)
         return Response(serializers.data)
 
+@permission_classes([IsAuthenticatedOrReadOnly,])
 class AllPages(APIView):
     def get(self,request):
         pages = Page.objects.all()
         serializers = PageSerializer(pages,many=True)
         return Response(serializers.data)
 
+@permission_classes([IsAuthenticatedOrReadOnly,])
 class AllPoems(APIView):
     def get(self,request):
         poems = Poem.objects.all().order_by('-uploaded')
         serializers = PoemSerializer(poems,many=True)
         return Response(serializers.data)
 
+@permission_classes([IsAuthenticatedOrReadOnly,])
 class PinnedPoem(APIView):
     def get(self,request):
         poems = Poem.objects.all().filter(status='pinned').last()
         serializers = PoemSerializer(poems,many=False)
         return Response(serializers.data)
 
+@permission_classes([IsAuthenticatedOrReadOnly,])
 class RelatedPoems(APIView):
     def get(self,request, category):
         poems = Poem.objects.all().filter(category=category).order_by('title')
         serializers = PoemSerializer(poems,many=True)
         return Response(serializers.data)
 
+@permission_classes([IsAuthenticatedOrReadOnly,])
 class RelatedStories(APIView):
     def get(self,request, id):
         by_categ = Story.objects.all().filter(category=id).order_by('title')
@@ -256,6 +271,7 @@ class RelatedStories(APIView):
             return Response(serializers.data)
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+@permission_classes([IsAuthenticatedOrReadOnly,])
 class StoryDetails(APIView):
     def get(self,request, id):
         story = Story.objects.all().filter(pk=id).last()
@@ -281,24 +297,28 @@ class StoryDetails(APIView):
             story.refresh_from_db()
         return Response(serializers.data)
 
+@permission_classes([IsAuthenticatedOrReadOnly,])
 class PageDetails(APIView):
     def get(self,request, id):
         page = Page.objects.all().filter(pk=id).last()
         serializers = PageSerializer(page,many=False)
         return Response(serializers.data)
 
+@permission_classes([IsAuthenticatedOrReadOnly,])
 class ChapterDetails(APIView):
     def get(self,request, id):
         chapter = Chapter.objects.all().filter(pk=id).last()
         serializers = ChapterSerializer(chapter,many=False)
         return Response(serializers.data)
 
+@permission_classes([IsAuthenticatedOrReadOnly,])
 class PoemDetails(APIView):
     def get(self,request, id):
         poem = Poem.objects.all().filter(pk=id).last()
         serializers = PoemSerializer(poem,many=False)
         return Response(serializers.data)
 
+@permission_classes([AllowAny,])
 class ChapterReactions(APIView):
     def get(self, request, id):
         likes = Reaction.objects.all().filter(chapter=id)
@@ -313,14 +333,14 @@ class ChapterReactions(APIView):
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST) 
 
     
-
+@permission_classes([IsAuthenticatedOrReadOnly,])
 class Feedbacks(APIView):
     def get(self, request, id):
         comments = Feedback.objects.all().filter(chapter=id)
         serializers = FeedbackSerializer(comments,many=True)
         return Response(serializers.data)
 
-# @permission_classes([IsAdminUser,])
+@permission_classes([IsAdminUser,])
 class AddStory(APIView):
     def post(self, request):
         serializers = StorySerializer(data=request.data)
@@ -329,7 +349,7 @@ class AddStory(APIView):
             return Response(serializers.data,status=status.HTTP_201_CREATED)
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)  
 
-
+@permission_classes([IsAdminUser,])
 class AddPoem(APIView):
     def post(self, request):
         serializers = PoemSerializer(data=request.data)
@@ -338,7 +358,7 @@ class AddPoem(APIView):
             return Response(serializers.data,status=status.HTTP_201_CREATED)
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST) 
 
-# @permission_classes([IsAdminUser,])
+@permission_classes([IsAdminUser,])
 class AddPage(APIView):
     def post(self, request):
         serializers = PageSerializer(data=request.data)
@@ -347,7 +367,7 @@ class AddPage(APIView):
             return Response(serializers.data,status=status.HTTP_201_CREATED)
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)  
 
-# @permission_classes([IsAdminUser,])
+@permission_classes([IsAdminUser,])
 class UpdateStory(APIView):
     def put(self, request, id, format=None):
         story = Story.objects.all().filter(pk=id).last()
@@ -362,7 +382,7 @@ class UpdateStory(APIView):
         story.delete()
         return Response(status=status.HTTP_200_OK) 
 
-# @permission_classes([IsAdminUser,])
+@permission_classes([IsAdminUser,])
 class UpdatePage(APIView):
     def put(self, request, id, format=None):
         page = Page.objects.all().filter(pk=id).last()
@@ -377,6 +397,7 @@ class UpdatePage(APIView):
         page.delete()
         return Response(status=status.HTTP_200_OK) 
 
+@permission_classes([IsAdminUser,])
 class UpdatePoem(APIView):
     def put(self, request, id, format=None):
         poem = Poem.objects.all().filter(pk=id).last()
@@ -391,7 +412,7 @@ class UpdatePoem(APIView):
         poem.delete()
         return Response(status=status.HTTP_200_OK) 
 
-# @permission_classes([IsAdminUser,])
+@permission_classes([IsAdminUser,])
 class AddChapter(APIView):
     def post(self, request):
         serializers = ChapterSerializer(data=request.data)
@@ -400,7 +421,7 @@ class AddChapter(APIView):
             return Response(serializers.data,status=status.HTTP_201_CREATED)
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)  
 
-# @permission_classes([IsAdminUser,])
+@permission_classes([IsAdminUser,])
 class UpdateChapter(APIView):
     def put(self, request, id, format=None):
         chap = Chapter.objects.all().filter(pk=id).last()
@@ -415,7 +436,7 @@ class UpdateChapter(APIView):
         chap.delete()
         return Response(status=status.HTTP_200_OK) 
         
-# @permission_classes([IsAdminUser,])
+@permission_classes([IsAdminUser,])
 class AddTag(APIView):
     def post(self, request):
         serializers = TagSerializer(data=request.data)
@@ -426,7 +447,7 @@ class AddTag(APIView):
 
 
 
-# @permission_classes([IsAdminUser,])
+@permission_classes([IsAdminUser,])
 class TagDetails(APIView):
     def get(self,request, id):
         tag = Tag.objects.all().filter(pk=id).last()
@@ -446,7 +467,7 @@ class TagDetails(APIView):
         tag.delete()
         return Response(status=status.HTTP_200_OK) 
 
-# @permission_classes([IsAdminUser,])
+@permission_classes([IsAdminUser,])
 class ReactionDetails(APIView):
     def get(self,request, id):
         reaction = Reaction.objects.all().filter(pk=id).last()
@@ -458,7 +479,7 @@ class ReactionDetails(APIView):
         reaction.delete()
         return Response(status=status.HTTP_200_OK) 
 
-# @permission_classes([IsAdminUser,])
+@permission_classes([IsAdminUser,])
 class FeedbackDetails(APIView):
     def get(self,request, id):
         comment = Feedback.objects.all().filter(pk=id).last()
@@ -489,6 +510,7 @@ class FeedbackDetails(APIView):
         feedback.delete()
         return Response(status=status.HTTP_200_OK) 
 
+@permission_classes([IsAuthenticatedOrReadOnly,])
 class StoryChapters(APIView):
     def get(self,request, id):
         chapters = Chapter.objects.all().filter(story=id).order_by('pk')
@@ -504,6 +526,7 @@ class StoryChapters(APIView):
         serializers = ChapterSerializer(chapters,many=True)
         return Response(serializers.data)
 
+@permission_classes([IsAuthenticatedOrReadOnly,])
 class StoryReactions(APIView):
     def get(self, request, id):
         reactions = Reaction.objects.all().filter(story=id).filter(like='like')
@@ -515,6 +538,7 @@ class StoryReactions(APIView):
         serializers = ReactionSerializer(reactions,many=True)
         return Response(serializers.data)
 
+@permission_classes([IsAuthenticatedOrReadOnly,])
 class StoryFeedbacks(APIView):
     def get(self, request, id):
         feedbacks = Feedback.objects.all().filter(story=id).order_by('-date')
@@ -527,18 +551,21 @@ class StoryFeedbacks(APIView):
         serializers = FeedbackSerializer(feedbacks,many=True)
         return Response(serializers.data)
 
+@permission_classes([IsAuthenticatedOrReadOnly,])
 class PoemReactions(APIView):
     def get(self, request, id):
         reactions = Reaction.objects.all().filter(poem=id).filter(like='like')
         serializers = ReactionSerializer(reactions,many=True)
         return Response(serializers.data)
 
+@permission_classes([IsAuthenticatedOrReadOnly,])
 class PoemFeedbacks(APIView):
     def get(self, request, id):
         feedbacks = Feedback.objects.all().filter(poem=id).order_by('-date')
         serializers = FeedbackSerializer(feedbacks,many=True)
         return Response(serializers.data)
 
+@permission_classes([IsAuthenticatedOrReadOnly,])
 class FeedbackReplies(APIView):
     def get(self, request, id):
         replies = Reply.objects.all().filter(comment=id).order_by('-date')
@@ -549,6 +576,7 @@ class FeedbackReplies(APIView):
         serializers = ReplySerializer(replies,many=True)
         return Response(serializers.data)
 
+@permission_classes([IsAuthenticatedOrReadOnly,])
 class FeedbackLikes(APIView):
     def get(self, request, id):
         likes = Reaction.objects.all().filter(comment=id).order_by('-date')
@@ -561,6 +589,7 @@ class FeedbackLikes(APIView):
             return Response(serializers.data)
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+@permission_classes([IsAuthenticatedOrReadOnly,])
 class ChapterPages(APIView):
     def get(self,request, id):
         pages = Page.objects.all().filter(chapter=id).order_by('pk')
@@ -572,6 +601,7 @@ class ChapterPages(APIView):
         serializers = PageSerializer(pages,many=True)
         return Response(serializers.data)
 
+@permission_classes([AllowAny,])
 class AllSubscribers(APIView):
     # permission_classes = (IsAdminUser,IsAuthenticated)
     def get(self,request,format=None):
@@ -632,6 +662,7 @@ class AllSubscribers(APIView):
             return Response(serializers.data, status=status.HTTP_201_CREATED)
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@permission_classes([AllowAny,])
 class Unsubscribe(APIView):
     def get(self,request,user_email):
         subscriber = Subscriber.objects.all().filter(email=user_email).last()
@@ -684,7 +715,7 @@ class Unsubscribe(APIView):
         return Response(status=status.HTTP_421_MISDIRECTED_REQUEST)
         
             
-
+@permission_classes([AllowAny,])
 class Notifications(APIView):
     def get(self,request):
         notifications = Notification.objects.all().order_by('-date')
@@ -698,6 +729,7 @@ class Notifications(APIView):
             return Response(serializers.data)
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST) 
 
+@permission_classes([IsAdminUser,])
 class NotificationDetails(APIView):
     def get(self,request,id):
         notification = Notification.objects.all().filter(pk=id).last()
@@ -717,6 +749,7 @@ class NotificationDetails(APIView):
         notification.delete()
         return Response(status=status.HTTP_200_OK) 
 
+@permission_classes([IsAdminUser,])
 class Contacts(APIView):
     def get(self,request):
         contacts = Contact.objects.all().order_by('-date')
@@ -776,6 +809,7 @@ class Contacts(APIView):
             return Response(serializers.data)
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST) 
 
+@permission_classes([IsAdminUser,])
 class ContactDetails(APIView):
     def get(self,request,id):
         contact = Contact.objects.all().filter(pk=id).last()
@@ -795,6 +829,7 @@ class ContactDetails(APIView):
         contact.delete()
         return Response(status=status.HTTP_200_OK) 
 
+@permission_classes([IsAdminUser,])
 class SubscriberDetails(APIView):
     def get(self,request,id):
         subscriber = Subscriber.objects.all().filter(pk=id).last()
@@ -814,7 +849,7 @@ class SubscriberDetails(APIView):
         subscriber.delete()
         return Response(status=status.HTTP_200_OK) 
 
-
+@permission_classes([IsAuthenticatedOrReadOnly,])
 class PastPoems(APIView):
     def get(self,request,date):
         poems = Poem.search(date)

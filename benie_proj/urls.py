@@ -22,4 +22,5 @@ urlpatterns = [
     path('api/',include('benie_app.urls')),
     path('admin/', admin.site.urls),
     path('api/admin/',include('benie_app.urls_admin')),
+    path('api/benie/',include('benie_app.urls_auth')),
 ]
